@@ -1,5 +1,6 @@
 / qlens dynamic pass: load deps then ONE target file in this isolated process, report what it defined.
-/ usage: q dynamic.q -target /abs/f.q -deps /abs/a.q,/abs/b.q -ns .gw,.a.b -out result.json -q
+/ usage: QINIT=dynamic.q QLENS_OUT=result.json QLENS_DEPS=/abs/a.q,/abs/b.q QLENS_NS=.gw,.a.b q <target> -q  (stdin: `.dy.fin[]`)
+/ The target is the MAIN script, so .z.f and relative paths behave as when a user runs `q <target>` from the repo root.
 / Runs only inside the sandbox. Third-party code executes here.
 
 .dy.skipns:`q`Q`h`j`o`z`s`m;
@@ -54,15 +55,21 @@
  (hsym `$.dy.out) 0: enlist .j.j a;}
 
 .dy.main:{
- o:.Q.opt .z.x;
- .dy.out::first o`out;
- .dy.nss::.dy.allns .dy.nsfix each `$$[count first o`ns;"," vs first o`ns;()];
- deps:$[count first o`deps; "," vs first o`deps; ()];
+ .dy.out::getenv`QLENS_OUT;
+ ns:getenv`QLENS_NS;
+ .dy.nss::.dy.allns .dy.nsfix each `$$[count ns;"," vs ns;()];
+ d:getenv`QLENS_DEPS;
+ deps:$[count d;"," vs d;()];
+ / runs if the file calls exit before it finished loading
  .z.exit:{.dy.write[]};
  errs:{[p] e:@[{system "l ",x;""};p;{x}]; $[count e;enlist `file`error!(p;e);()]} each deps;
  .dy.before::.dy.snap[.dy.nss];
- e:@[{system "l ",x;""};first o`target;{x}];
- .dy.res::`loaded`error`dep_errors!(0=count e;e;raze errs);
+ .dy.res::`loaded`error`dep_errors!(0b;"exited before the file finished loading";raze errs)}
+
+/ the driver feeds this line on stdin; q reads it once the target (the main script) has finished or stopped on an error
+.dy.fin:{
+ .dy.res[`loaded]:1b;
+ .dy.res[`error]:"";
  .dy.write[];
  exit 0}
 

@@ -129,3 +129,30 @@ def test_null_valued_variables_and_trailing_semicolon_and_runtime_load(tmp_path)
     lab = {x["id"]: x["label"] for x in r["nodes"]}
     imps = {(lab[e["source"]], lab[e["target"]]) for e in r["edges"] if e["relation"] == "imports"}
     assert ("t.q", "lib.q") in imps  # the dependency q revealed
+
+
+@needs_q
+def test_file_that_finds_its_folder_from_z_f_loads(tmp_path):
+    """Regression: .z.f was the harness script, so a file locating its own directory from it looked inside qlens."""
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "lib.q").write_text("libf:{x+1}\n")
+    (tmp_path / "boot.q").write_text('d:ssr[string .z.f;"boot.q";""]\nsystem "l ",d,"src/lib.q"\nusef:{libf x}\n')
+    r = analyse(tmp_path, execute=True)
+    d = r["meta"]["dynamic"]
+    assert d["files_loaded"] >= 1, d["load_results"]
+    boot = next(x for x in d["load_results"] if x["file"] == "boot.q")
+    assert boot["loaded"] and not boot["error"], boot
+    assert _nodes(r)["usef"]["tier"] == "D2"
+
+
+@needs_q
+def test_load_error_text_and_early_exit_are_reported(tmp_path):
+    (tmp_path / "bad.q").write_text("a:{x}\nb:undefinedname+1\nc:{x}\n")
+    (tmp_path / "quits.q").write_text("e1:{x}\nexit 0\ne2:{x}\n")
+    r = analyse(tmp_path, execute=True, timeout=20)
+    res = {x["file"]: x for x in r["meta"]["dynamic"]["load_results"]}
+    assert not res["bad.q"]["loaded"] and res["bad.q"]["error"] == "undefinedname"
+    assert not res["quits.q"]["loaded"] and "exited" in res["quits.q"]["error"]
+    n = _nodes(r)
+    assert n["a"]["tier"] == "D2" and n["e1"]["tier"] == "D2"  # defined before the stop
+    assert n["c"]["tier"] != "D2" and n["e2"]["tier"] != "D2"  # never reached

@@ -94,3 +94,13 @@ below the 104h check; need a proper "primitive" tag), single-element `` ,`a`` vs
 - sandbox-exec: `(deny file-read-data (subpath $HOME))` must be paired with `(allow file-read-data file-read-metadata ...)`;
   allowing the wildcard `file-read*` does not override the more specific deny. Verified blocked: read of `~/.zshrc`,
   write outside temp dir, exec of `ls`, `hopen` to localhost.
+
+## `.z.f`, QINIT and how the dynamic pass launches a file (found from dev run 6)
+- `.z.f` is the MAIN script (as given on the command line), not the file being loaded with `\l`, and it cannot be assigned
+  (`.z.f:`x` -> `'domain`). Files that find their own folder from it (BuaBook kdb-common `boot.q`, kdbx-modules) broke when
+  the harness was the main script.
+- `QINIT=<file>` loads a q file before the main script. An error in the main script stops loading (later lines do not run),
+  q prints `'<timestamp> <message>` and then reads stdin; `.z.exit` still runs at EOF/`exit`.
+- So the dynamic pass now runs `q <target relative to the repo> -q` with the harness preloaded through QINIT, parameters in
+  `QLENS_*` env vars (not `.z.x`, which a target may parse), and one stdin line `.dy.fin[]` that runs after the target
+  has finished or stopped. The error text is read from q's error line.

@@ -136,3 +136,12 @@ Limits of this number, stated plainly:
 - Outliers: no repo dominates misses (missed edges 0). Dev outliers for definitions are listed under dev run 5.
 Spec targets on held-out data (precision >= 99%; recall reported): met. This is the one test run; it is not to be repeated
 after further changes, and any later code change must be reported as made after seeing test data.
+
+## After the held-out run: dynamic pass launches the target as the main script
+Made AFTER the single test run (test split not re-run, nothing tuned on it). Dev run 6 added `load_causes` to the output:
+of 1122 dev files that did not load, 596 stopped on "missing or unreadable file". Part of that was a qlens bug: `.z.f` pointed at
+qlens's own harness, so files locating their folder from it looked inside qlens (e.g. kdbx-modules,
+`.../qlens/src/qlens/q/dynamic.q/analytics.q: Not a directory`). Fixed by launching the target as the main script.
+Other causes are environment limits, not bugs: puzzle input files absent from the repo (Advent-of-Code repos: 4 repos, ~364 files),
+downloads and network (`.ut.download`, `hop`), framework bootstrap (`.proc.getconfigfile`), embedPy (`.p.import`).
+The effect of the fix on the loaded rate is not measured yet (dev run 7 pending).

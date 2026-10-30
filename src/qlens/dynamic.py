@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -41,6 +42,9 @@ def dependency_order(rel: str, imports: dict[str, list[str]]) -> list[str]:
     return order
 
 
+_ERR_LINE = re.compile(r"^'(?:\d{4}\.\d\d\.\d\dT[\d:.]+ )?(.+)$", re.M)
+
+
 def run_file(
     target: Path,
     deps: list[Path],
@@ -50,12 +54,22 @@ def run_file(
     timeout: float = 30,
     backend: str | None = None,
 ) -> DynFile:
+    """Load `target` as the main script of a sandboxed q, after its dependencies, and report what it defined.
+
+    The target is the main script (not loaded by a harness) so `.z.f` and relative paths behave as they do when
+    a user runs `q <target>` from the repo root. A harness preloaded through QINIT reports the result, and the
+    error, if the file stopped on one, is read from q's own error line.
+    """
     script = _script()
     with tempfile.TemporaryDirectory(prefix="qlens-dyn-") as td:
         tmp = Path(td).resolve()
         out = tmp / "result.json"
-        args = [str(script), "-target", str(target), "-deps", ",".join(map(str, deps)), "-ns", ",".join(namespaces), "-out", str(out), "-q"]
-        res = run_q(args, read_paths=[base, script.parent], write_dir=tmp, timeout=timeout, backend=backend, cwd=cwd)
+        try:
+            main = str(Path(target).resolve().relative_to(Path(cwd).resolve()))
+        except ValueError:
+            main = str(target)
+        env = {"QINIT": str(script), "QLENS_OUT": str(out), "QLENS_DEPS": ",".join(map(str, deps)), "QLENS_NS": ",".join(namespaces)}
+        res = run_q([main, "-q"], read_paths=[base, script.parent], write_dir=tmp, timeout=timeout, backend=backend, cwd=cwd, env=env, stdin_text=".dy.fin[]\n")
         if not out.exists():
             why = "timeout" if res.timed_out else f"no result (rc={res.returncode}): {(res.stderr or res.stdout).strip()[:200]}"
             return DynFile(failure=why)
@@ -63,9 +77,13 @@ def run_file(
             d = json.loads(out.read_text())
         except json.JSONDecodeError as e:
             return DynFile(failure=f"unreadable result: {e}")
+    loaded, error = bool(d.get("loaded")), d.get("error") or ""
+    m = _ERR_LINE.search(f"{res.stderr}\n{res.stdout}")
+    if m:  # the main script stopped on an error: q prints it and goes on to read stdin
+        loaded, error = False, m.group(1).strip()
     return DynFile(
-        loaded=bool(d.get("loaded")),
-        error=d.get("error") or "",
+        loaded=loaded,
+        error=error,
         dep_errors=d.get("dep_errors") or [],
         defs={x["name"]: x for x in d.get("defs", [])},
     )

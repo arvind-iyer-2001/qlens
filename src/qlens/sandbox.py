@@ -87,13 +87,15 @@ def docker_command(
     uid: int | None = None,
     gid: int | None = None,
     cwd: Path | None = None,
+    env: dict[str, str] | None = None,
+    interactive: bool = False,
 ) -> list[str]:
     """Linux: docker run with no network, read-only fs, caps dropped; workspace/q/licence mounted
     read-only at their host paths and one writable temp bind."""
     uid = os.getuid() if uid is None else uid
     gid = os.getgid() if gid is None else gid
     cmd = [
-        "docker", "run", "--rm", "--init", "--name", name,
+        "docker", "run", "--rm", "--init", *(["-i"] if interactive else []), "--name", name,
         "--network", "none", "--read-only", "--cap-drop", "ALL",
         "--security-opt", "no-new-privileges", "--pids-limit", "256",
         "--memory", "2g", "--cpus", "1", "--user", f"{uid}:{gid}",
@@ -108,6 +110,8 @@ def docker_command(
     for var in ("QHOME", "QLIC"):
         if os.environ.get(var):
             cmd += ["-e", f"{var}={os.environ[var]}"]
+    for k, v in (env or {}).items():
+        cmd += ["-e", f"{k}={v}"]
     cmd += ["-w", str(cwd or write_dir), image, str(q_bin), *q_args]
     return cmd
 
@@ -120,6 +124,8 @@ def run_q(
     backend: str | None = None,
     image: str | None = None,
     cwd: Path | None = None,
+    env: dict[str, str] | None = None,
+    stdin_text: str | None = None,
 ) -> RunResult:
     """Run `q <q_args>` sandboxed. write_dir must exist; it is the only writable path."""
     backend = backend or os.environ.get("QLENS_BACKEND") or default_backend()
@@ -136,13 +142,14 @@ def run_q(
     elif backend == "docker":
         image = image or os.environ.get("QLENS_IMAGE") or "debian:stable-slim"
         name = f"qlens-{uuid.uuid4().hex[:10]}"
-        cmd = docker_command(q_bin, read_paths, write_dir, q_args, name, image, cwd=cwd)
+        cmd = docker_command(q_bin, read_paths, write_dir, q_args, name, image, cwd=cwd, env=env, interactive=stdin_text is not None)
     else:
         raise SandboxError(f"unknown backend {backend!r}")
     try:
         cp = subprocess.run(
             cmd, capture_output=True, text=True, errors="replace", timeout=timeout,
-            stdin=subprocess.DEVNULL, cwd=cwd or write_dir,
+            **({"input": stdin_text} if stdin_text is not None else {"stdin": subprocess.DEVNULL}),
+            cwd=cwd or write_dir, env={**os.environ, **env} if env else None,
         )  # fmt: skip
         return RunResult(cp.returncode, cp.stdout, cp.stderr, False)
     except subprocess.TimeoutExpired as e:
