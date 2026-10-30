@@ -8,6 +8,9 @@ dependencies = []
 [project.scripts]
 qlens = "qlens.cli:main"
 
+[project.entry-points."graphify.extractors"]
+qlens = "qlens.graphify_plugin:PLUGIN"
+
 [dependency-groups]
 dev = ["pytest>=8"]
 

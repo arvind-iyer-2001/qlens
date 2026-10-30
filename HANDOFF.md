@@ -1,4 +1,4 @@
-# Handoff — 2026-10-30
+# Handoff — 2026-10-30 (updated after graphify plugin work)
 
 ## State
 qlens extracts a q/kdb+ knowledge graph deterministically (no LLM, no tree-sitter): q's own `parse`/`value` is the parser, every node/edge has tier + confidence + evidence. Works: discovery, splitter, sandboxed static pass, graph builder, trap corpus (exact), dynamic `--execute` pass (D2/D3/refuted), graphify-shaped export, corpus tooling, 43 tests green. Purpose: graphify has no tree-sitter grammar for q, so qlens supplies the AST-step equivalent for `.q` files; graphify would call `qlens export` for q files and merge by node id.
@@ -6,6 +6,11 @@ qlens extracts a q/kdb+ knowledge graph deterministically (no LLM, no tree-sitte
 ## Done this session
 - M0 spike (`docs/Q_FACTS.md`), M1 splitter/discovery, M2 static pass + graph + trap corpus, M3 calibration/report, M4 dynamic pass + tests, graphify export (`src/qlens/export.py`), multi-repo resolution fix (M7), README (M5 instructions), M6 tooling (`scripts/fetch_corpus.py`, `qlens corpus|summary|calibrate`).
 - Real-repo trial (static only): KxSystems/kdb parses with 1 diagnostic; sambacha/q-evm has k-syntax files (honest diagnostics).
+
+## Graphify (current)
+- All old graphify installs removed from this machine (Arvind's request). Fresh clone of `Graphify-Labs/graphify` (default branch `v8`) at `~/development/graphify`; the earlier `safishamsi/graphify` clone with the q-support commits is gone.
+- Branch `plugin-extractors` (1 commit, NOT pushed): `graphify/plugins.py` plugin system (entry-point group `graphify.extractors`, `GRAPHIFY_PLUGINS`, per-file or batch, validated output, no fallback), wired into detect/extract/cache salt/watch, `graphify plugins` command, `docs/PLUGINS.md`, 31 tests. Baseline note: 2 tests in `test_extractor_scan_root_context.py` fail on untouched v8 when run after other files (order-dependent, not ours).
+- qlens side: `src/qlens/graphify_plugin.py` (plain dict, no graphify import) + entry point in `pyproject.toml`. Verified end to end: `uv pip install -e /Users/arvindiyer/qlens --python ~/development/graphify/.venv/bin/python`, then `graphify plugins`.
 
 ## In progress
 - Background fetch of up to 250 public q repos into `corpora/` (gitignored; `corpora/MANIFEST.json` lists them). Next: static-build all, error-analyse by cause, fix generally, record in `docs/RESULTS.md`.

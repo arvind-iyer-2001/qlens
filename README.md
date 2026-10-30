@@ -52,6 +52,21 @@ Residual risk: a native `.so` shipped in a repo would run inside the sandbox. `-
 |---|---|
 | `qlens build ROOT --out DIR [--execute] [--backend B] [--timeout S]` | graph.json + report.json |
 | `qlens export SRC --out FILE` | graphify-shaped JSON (SRC = q dir or graph.json) |
+
+## Use with graphify
+
+qlens is a graphify extractor plugin for `.q` files. Install it into the same environment as graphify and
+graphify picks it up through the `graphify.extractors` entry point; there is nothing to configure:
+
+```bash
+uv pip install -e /path/to/qlens --python /path/to/graphify/.venv/bin/python
+graphify plugins        # should list: qlens  [batch, code]  .q
+```
+
+graphify hands qlens every `.q` file in one call (names resolve across files). There is no fallback: if qlens
+cannot run (for example `q` is not installed) the `.q` files get a visible error. qlens itself does not import
+graphify. `QLENS_GRAPHIFY_EXECUTE=1` adds the sandboxed dynamic pass. The plugin API is documented in
+graphify's `docs/PLUGINS.md`.
 | `qlens eval ROOT TRUTH.json` | precision/recall against a hand-made truth file |
 | `qlens measure ROOT` | one JSON line of static-vs-live agreement (runs q on the code, sandboxed) |
 | `qlens corpus DIR --split dev\|test\|all --jobs N --timeout S --out results.jsonl` | resumable corpus run |
