@@ -48,6 +48,8 @@ class Graph:
     edges: dict[tuple, dict] = field(default_factory=dict)
     queue: list[dict] = field(default_factory=list)
     diagnostics: list[dict] = field(default_factory=list)
+    cond: set = field(default_factory=set)  # node ids defined only inside a conditional
+    redef: set = field(default_factory=set)  # node ids defined more than once in their file
     raw: dict[tuple, set] = field(default_factory=dict)  # edge key -> names as written in source
     fn: dict[str, dict] = field(default_factory=dict)  # function node id -> {free, ns, file}
     imports: dict[str, list[str]] = field(default_factory=dict)  # file rel -> imported file rels
@@ -144,33 +146,53 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
                 continue
             tree, free = res.tree, set(res.free or [])
             sdefs = find_defs(tree)
-            owners: list[str] = []
+            def_nodes: list[tuple] = []
             for d in sdefs:
                 q = qualify(d.name, ns)
                 nid = make_id(f["rel"], q)
                 if nid not in g.nodes:
-                    tier = "S-indirect" if (d.indirect and d.kind == "variable") else "S"
+                    tier = "S-indirect" if ((d.indirect and d.kind == "variable") or d.conditional) else "S"
                     ev = f"{d.name}: assigned at top level ({'lambda' if d.kind == 'function' else 'non-lambda'} rhs)"
-                    if tier == "S-indirect":
+                    if d.conditional:
+                        ev += "; defined inside a conditional (may never execute)"
+                        g.cond.add(nid)
+                    elif tier == "S-indirect":
                         ev += "; rhs may evaluate to a function (indirect)"
                     g.node(nid, q, d.kind, f["rel"], line, tier, ev)
                     g.edge(f["id"], nid, "contains", "S", f"defined at {f['rel']}:{line}", f["rel"], line)
                     defs_index.setdefault(q, []).append(nid)
                     if d.kind == "function":
                         g.fn[nid] = dict(free=all_free(d.rhs), ns=ns, file=f["rel"], name=q)
-                owners.append(nid)
-            owner_ids = owners or [f["id"]]
-            lam_nodes = []
+                else:
+                    g.redef.add(nid)  # defined again in the same file: live q holds only the last one
+                def_nodes.append((d, nid))
+
+            # each definition owns only the references inside its own right-hand side
+            handled: set[int] = set()
+            covered: set[tuple] = set()
+            for d, nid in def_nodes:
+                if d.kind == "function":
+                    handled.add(id(d.rhs))
+                    _lam(f, ns, [nid], d.rhs, line, pending_refs)
+                else:
+                    r2, n2 = classify(d.rhs, free)
+                    covered |= {(k, role) for k, rs in r2.items() for role in rs}
+                    handled |= {id(x) for x in n2}
+                    _collect(f, ns, [nid], r2, line, pending_refs, "S")
+                    for lam in n2:
+                        _lam(f, ns, [nid], lam, line, pending_refs)
+            # anything outside every definition belongs to the file
             roles, nested = classify(tree, free)
-            for dn in {d.name for d in sdefs}:  # the definition itself writes its own name: not a reference
-                if dn in roles:
-                    roles[dn].discard("writes")
-                    if not roles[dn]:
-                        del roles[dn]
-            _collect(f, ns, owner_ids, roles, line, pending_refs, "S")
+            own_names = {d.name for d, _ in def_nodes}
+            rest = {}
+            for k, rs in roles.items():
+                keep = {role for role in rs if (k, role) not in covered and not (k in own_names and role == "writes")}
+                if keep:
+                    rest[k] = keep
+            _collect(f, ns, [f["id"]], rest, line, pending_refs, "S")
             for lam in nested:
-                _lam(f, ns, owner_ids, lam, line, pending_refs)
-            lam_nodes.extend(nested)
+                if id(lam) not in handled:
+                    _lam(f, ns, [f["id"]], lam, line, pending_refs)
 
     # 4. resolve references to nodes
     builtins = run.builtins

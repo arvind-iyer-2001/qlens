@@ -52,14 +52,15 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
                 if info["type"] == 100 and n["kind"] == "variable":
                     n["kind"] = "function"
                 m["defs_agree"] += 1
-            elif dr.loaded and IMPLICIT not in n["evidence"]:
+            elif dr.loaded and IMPLICIT not in n["evidence"] and n["id"] not in g.cond:
                 _set(n, "S-refuted", "file loaded in q but this name does not exist afterwards")
                 m["defs_refuted"] += 1
                 if len([x for x in m["examples"] if x["kind"] == "def_refuted"]) < 12:
                     m["examples"].append(dict(kind="def_refuted", file=rel, name=q, line=n["line"], static_kind=n["kind"], evidence=n["evidence"][:140],
                                               live_names_sample=sorted(dr.defs)[:15]))  # fmt: skip
         for q, info in dr.defs.items():
-            if q not in static_q:
+            container = info["type"] == 99 and any(o.startswith(q + ".") for o in [*static_q, *dr.defs])
+            if q not in static_q and not container:  # a namespace/dict holding other names is not a missed definition
                 m["defs_missed"] += 1
                 if len([x for x in m["examples"] if x["kind"] == "def_missed"]) < 12:
                     m["examples"].append(dict(kind="def_missed", file=rel, name=q, live_type=info["type"], static_names_sample=sorted(static_q)[:15]))
@@ -82,10 +83,15 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
             if ctx != fi["ns"]:
                 m["ns_mismatch"] += 1
                 g.diagnostics.append(dict(file=rel, line=None, error=f"namespace context: static {fi['ns'] or '.'} vs live {ctx or '.'} for {fi['name']}", text=""))
+            if nid in g.redef:
+                continue  # defined more than once in this file: live q holds only the last, cannot judge edges
+            ctxname = info.get("ctx") or ""  # q lists the context namespace and a same-named variable as one entry
             dfree = set(info.get("free_all") or info["free"])
             for key in out_edges.get(nid, []):
                 e = g.edges[key]
-                raws = g.raw.get(key, set())
+                raws = g.raw.get(key, set()) - {ctxname}
+                if not raws:
+                    continue
                 if e["tier"] == "S-unresolved":
                     m["dangling"] += 1
                     continue
@@ -103,7 +109,7 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
                         m["indirect_refuted"] += 1
                     _set(e, "S-refuted", "name absent from the free names of the live function")
                     m["refuted"] += 1
-            extra = dfree - fi["free"]
+            extra = dfree - fi["free"] - {ctxname}
             if extra and len([x for x in m["examples"] if x["kind"] == "missed"]) < 12:
                 m["examples"].append(dict(kind="missed", file=rel, fn=fi["name"], names=sorted(extra)[:10], live_free=sorted(dfree)[:20],
                                           static_free=sorted(fi["free"])[:20], live_ctx=info.get("ctx"), static_ns=fi["ns"]))  # fmt: skip

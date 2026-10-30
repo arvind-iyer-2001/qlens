@@ -25,6 +25,7 @@ class Def:
     kind: str  # function | variable
     indirect: bool
     rhs: dict
+    conditional: bool = False  # assigned inside $[c;..;..], if[], while[] or do[]: may never execute
 
 
 def _kids(n: dict) -> list[dict]:
@@ -118,10 +119,12 @@ def find_defs(tree: dict) -> list[Def]:
     """Global definitions made by a top-level statement (not entering lambdas)."""
     defs: list[Def] = []
 
-    def go(n: dict) -> None:
+    def go(n: dict, cond: bool = False) -> None:
         if n["k"] != "app" or not n["v"]:
             return
         h, args = n["v"][0], n["v"][1:]
+        if (_fn(h) == "$" and len(args) >= 3) or (h["k"] == "sym" and h["v"] in ("if", "do", "while")):
+            cond = True
         if _is_assign_head(h) and len(args) == 2 and args[0]["k"] == "sym":
             rhs = args[1]
             names = [args[0]["v"]]
@@ -130,11 +133,11 @@ def find_defs(tree: dict) -> list[Def]:
                 rhs = rhs["v"][2]
             kind = "function" if rhs["k"] == "lam" else "variable"
             for nm in names:
-                defs.append(Def(nm, kind, _indirect(rhs), rhs))
-            go(rhs)
+                defs.append(Def(nm, kind, _indirect(rhs), rhs, cond))
+            go(rhs, cond)
             return
         for a in n["v"]:
-            go(a)
+            go(a, cond)
 
     go(tree)
     return defs

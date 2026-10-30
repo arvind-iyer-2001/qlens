@@ -69,3 +69,16 @@ recall >= 96% met, median 100% met, p10 >= 95% NOT met (0.917). Largest remainin
 Definitions: 10373 confirmed live, 196 refuted, 2291 defined at runtime that the static pass did not see (unexamined).
 Coverage caveat: 948 files loaded, 1122 failed to load (not judged), 48 process failures; the numbers describe the
 loadable subset. Test split not run. Indirect: 927 agree / 15 refuted. Namespace-context mismatches: 4.
+
+### Cause analysis of dev run 3 (examples from TorQ, pykx, ws.q)
+
+Five measurement/attribution bugs found, all in qlens, fixed in the commit after run 3:
+1. Several definitions on one line (`del:{..};.z.pc:{..}`): every reference on the line was given to every function
+   defined on it. Now each definition owns only the references in its own right-hand side; the rest belongs to the file.
+2. Names defined only inside `$[c;..]`/`if[]`/`while[]`/`do[]` are marked conditional (tier S-indirect) and are not refuted
+   when q never ran that branch.
+3. `value` lists the definition namespace and a same-named variable (`cache` inside `.cache`) as one entry; that name is no
+   longer judged either way.
+4. A name defined more than once in a file: live q holds only the last, so its edges are not judged.
+5. A namespace/dictionary that holds other defined names (`.pm.auth` holding `.pm.auth.ldap`) is no longer a "missed" definition.
+Dev run 3 numbers (98.6% / 99.9% / median 1.0 / p10 0.917) therefore still include these artefacts; run 4 is needed.
