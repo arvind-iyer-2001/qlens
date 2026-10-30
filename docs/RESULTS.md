@@ -82,3 +82,17 @@ Five measurement/attribution bugs found, all in qlens, fixed in the commit after
 4. A name defined more than once in a file: live q holds only the last, so its edges are not judged.
 5. A namespace/dictionary that holds other defined names (`.pm.auth` holding `.pm.auth.ldap`) is no longer a "missed" definition.
 Dev run 3 numbers (98.6% / 99.9% / median 1.0 / p10 0.917) therefore still include these artefacts; run 4 is needed.
+
+## Dev run 4 (out/dev4.jsonl, 116 dev repos, code at the commit "Per-definition reference attribution...")
+
+Reference edges: precision 0.9998 (agree 9672, refuted 2), recall 1.0 (missed 0), per-repo precision median 1.0, p10 1.0.
+114 of 116 repos have zero refuted edges. All four dev targets from SPEC section 1 are met on the dev split.
+Indirect edges: 952 agree / 1 refuted. Dangling (unresolved) references: 802. Namespace-context mismatches: 4.
+Definitions: 10373 confirmed live, 169 refuted, 1924 defined at runtime but not seen statically
+(puzzle_solutions 1024, quantQ 461, sphinxQ 107, kdbslack 75, btick 63; refuted: peachq 72, kdbx-modules 29, kdbslack 17,
+TorQ 10, jupyterq 10). Definition recall about 84% (10373 / 12297), not yet analysed.
+
+What the edge metric does and does not show: it compares static references with `value` of the live function, and both
+come from q's compiler, so agreement on a function body is expected. It does not test that a name is bound to the right
+definition when several exist. Coverage: 948 of 2070 files loaded; the other files are not judged.
+The test split has not been run. Run 4 is the dev result to report; do not tune on the test split.
