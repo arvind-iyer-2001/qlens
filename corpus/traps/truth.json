@@ -1,0 +1,23 @@
+{
+ "relations": ["calls", "reads", "writes", "uses", "imports"],
+ "edges": [
+  ["real", "g", "calls"],
+  ["colsel", "trades", "uses"],
+  ["bump", "state", "reads"],
+  ["lookup", "trades", "reads"],
+  ["glob", "trades", "uses"],
+  ["fromfn", "lookup", "calls"],
+  [".gw.run", ".gw.helper", "calls"],
+  ["top", ".gw.run", "calls"],
+  [".svc.run", ".svc.helper", "calls"],
+  ["bump", "state", "writes"],
+  ["setg", "svc", "writes"],
+  ["setn", ".cfg.mode", "writes"],
+  ["amend", "state", "writes"],
+  ["useit", "pick", "calls"],
+  ["L", "l", "calls"],
+  ["indirect.q", "lib.q", "imports"],
+  ["usel", "libf", "calls"]
+ ],
+ "nodes": [["f1", "function"], ["f2", "function"], ["pick", "variable"], ["l", "function"], ["L", "function"], ["after", "function"]]
+}

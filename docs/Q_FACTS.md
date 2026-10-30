@@ -83,3 +83,14 @@ Observed: `'{` for `a:{`, `'(` for `((`, `'type` for a whitespace-only string
 (q emits JSON via `.j.j` of its own tagged structure). Gaps to fix in M2: the `:`/`;` heads show up as `lit` (type 102h is
 below the 104h check; need a proper "primitive" tag), single-element `` ,`a`` vs atom `` `a`` must stay distinct
 (`syms` vs `sym`), and nested lambdas inside the tree need their own `value` (the walker already recurses).
+
+## Added during M2
+
+- Assigning to a q built-in name is a PARSE error: `parse "cols:{select sym,px from trades where px>5}"` raises `'assign`
+  (`cols` is a q keyword). The statement is lost and reported as a diagnostic. Real code that shadows keywords is unparseable.
+- `q -q script.q -in a -out b` silently does nothing (rc 0, no output); the `-q` flag must come AFTER the script.
+- Top-level statement free names: wrapping a statement as `{[]stmt\n}` and taking `value` index 3 yields exactly its free
+  globals, with qsql columns excluded (no `x` implicit-param problem because of the explicit empty param list).
+- sandbox-exec: `(deny file-read-data (subpath $HOME))` must be paired with `(allow file-read-data file-read-metadata ...)`;
+  allowing the wildcard `file-read*` does not override the more specific deny. Verified blocked: read of `~/.zshrc`,
+  write outside temp dir, exec of `ls`, `hopen` to localhost.
