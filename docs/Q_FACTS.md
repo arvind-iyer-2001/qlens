@@ -71,7 +71,7 @@ body, 200k `;`-joined statements (0.1 s), nul byte / invalid UTF-8 (raise `'type
 Two probes were broken by my own test code (a `-3#` on a non-list), so 100k-deep parens and 2000-nested braces are
 UNMEASURED. Still treat q as crashable: one process per chunk, timeout, re-run remaining chunks after a crash.
 Errors from `parse` are catchable with `@[parse;s;handler]`; the message is only the error symbol text (`'-`, `'type`).
-Unbalanced `{` raises `'{`... wait: observed `'{` for `a:{`, `'(` for `((`, `'type` for a whitespace-only string
+Observed: `'{` for `a:{`, `'(` for `((`, `'type` for a whitespace-only string
 (whitespace-only must be skipped by the splitter).
 
 ## Static-pass wire format decision
