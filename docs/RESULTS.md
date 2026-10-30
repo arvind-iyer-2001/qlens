@@ -107,3 +107,15 @@ The test split has not been run. Run 4 is the dev result to report; do not tune 
   path (`system "l ",.qt.libDir,"/",x`). They are counted as `defs_elsewhere`, and the real dependency q revealed is added as a
   D2 `imports` edge. Names built at runtime with `(` sv fullNs,`addInput) set ...` that exist in no file remain genuinely
   invisible to a static pass and stay in `defs_missed`.
+
+## Dev run 5 (out/dev5.jsonl, 116 dev repos, code at the commit "Namespace switch with trailing ;, live listing via key...")
+
+Reference edges: precision 0.9998 (agree 9765, refuted 2), recall 1.0 (missed 0), per-repo median 1.0, p10 1.0.
+Definitions: 10449 confirmed live, 88 refuted (precision 0.9916), 79 missed (recall 0.9925), plus 1832 names defined in
+a different file than the one being loaded (counted as dependencies, with D2 `imports` edges, not as confirmations or misses).
+Indirect edges 955 agree / 1 refuted. Dangling references 804. Namespace-context mismatches 0.
+Files: 947 loaded, 1122 failed to load (not judged), 49 process failures (timeouts/crashes; one more than run 4, so
+file-level outcomes are not perfectly deterministic).
+Remaining refuted definitions by repo: kdbx-modules 28, kdbslack 17, peachq 13, jupyterq 10, aoc 6 (not analysed).
+Remaining missed: puzzle_solutions 31, qspec 13, dpy 8, kdbx-modules 7. This is the final dev result; the code is
+frozen for the one test-split run. Nothing is tuned on the test split.
