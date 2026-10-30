@@ -119,3 +119,20 @@ file-level outcomes are not perfectly deterministic).
 Remaining refuted definitions by repo: kdbx-modules 28, kdbslack 17, peachq 13, jupyterq 10, aoc 6 (not analysed).
 Remaining missed: puzzle_solutions 31, qspec 13, dpy 8, kdbx-modules 7. This is the final dev result; the code is
 frozen for the one test-split run. Nothing is tuned on the test split.
+
+## TEST split, single run (out/test1.jsonl, 19 held-out repos, code at 982afc3, nothing tuned afterwards)
+
+Reference edges: precision 1.0 (agree 1958, refuted 0), recall 1.0 (missed 0), per-repo precision median 1.0, p10 1.0.
+Indirect edges 174 agree / 0 refuted. Dangling references 266. Namespace mismatches 0.
+Definitions: 1679 confirmed live, 0 refuted (precision 1.0), 25 missed (recall 0.9853), 53 defined in another file.
+Files: 171 loaded, 147 failed to load (not judged), 3 process failures.
+
+Limits of this number, stated plainly:
+- Small and concentrated: KxSystems/ml contributes 1104 of 1958 edges (56%). 5 of 19 repos had no judged edges (no file loaded),
+  so the effective sample is 14 repos. Zero refuted of 1958 edges is consistent with a true error rate up to roughly 0.15%.
+- About 46% of files load in q here (dev 947/2069, test 171/318); the metric is silent about the rest.
+- The metric compares static references with `value` of the live function (both from q's compiler); it does not test that each
+  name binds to the right definition when several exist.
+- Outliers: no repo dominates misses (missed edges 0). Dev outliers for definitions are listed under dev run 5.
+Spec targets on held-out data (precision >= 99%; recall reported): met. This is the one test run; it is not to be repeated
+after further changes, and any later code change must be reported as made after seeing test data.
