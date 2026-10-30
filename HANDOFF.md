@@ -25,6 +25,7 @@ qlens: greenfield q/kdb+ knowledge-graph tool; q itself is the parser (SPEC.md i
 - Third-party q code runs only in the sandbox and only with `--execute`.
 - Quote errors verbatim; never claim unmeasured results. Stop and report after each milestone.
 - Normalize backslash commands to `system "..."` form (`\l f.q` -> `system "l f.q"`, `\w` -> `system "w"`, `\d` likewise). Lone `\` is not a command.
+- MUST work with graphify: add an export adapter (graphify-compatible graph), no dependency on graphify. Confirm schema source with Arvind first.
 - Scratch files go in the session scratchpad, not `/tmp`.
 
 ## Gotchas

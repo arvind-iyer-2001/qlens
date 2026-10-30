@@ -48,6 +48,9 @@ class Graph:
     edges: dict[tuple, dict] = field(default_factory=dict)
     queue: list[dict] = field(default_factory=list)
     diagnostics: list[dict] = field(default_factory=list)
+    raw: dict[tuple, set] = field(default_factory=dict)  # edge key -> names as written in source
+    fn: dict[str, dict] = field(default_factory=dict)  # function node id -> {free, ns, file}
+    imports: dict[str, list[str]] = field(default_factory=dict)  # file rel -> imported file rels
 
     def node(self, id_, label_, kind, file, line, tier, evidence, score=None):
         if id_ in self.nodes:
@@ -59,8 +62,10 @@ class Graph:
         )  # fmt: skip
         return self.nodes[id_]
 
-    def edge(self, src, dst, rel, tier, evidence, file, line, score=None):
+    def edge(self, src, dst, rel, tier, evidence, file, line, score=None, raw=None):
         key = (src, dst, rel)
+        if raw:
+            self.raw.setdefault(key, set()).add(raw)
         if key in self.edges:
             return
         sc = DEFAULT_SCORES[tier] if score is None else score
@@ -80,8 +85,6 @@ def _repo_root(path: Path, root: Path) -> Path:
 
 
 def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None = None, backend: str | None = None, timeout: float = 60) -> dict:
-    if execute:
-        raise NotImplementedError("dynamic pass (--execute) arrives in M4")
     root = Path(root).resolve()
     base = root if root.is_dir() else root.parent
     disc = discover(root, out_dir)
@@ -143,6 +146,8 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
                     g.node(nid, q, d.kind, f["rel"], line, tier, ev)
                     g.edge(f["id"], nid, "contains", "S", f"defined at {f['rel']}:{line}", f["rel"], line)
                     defs_index.setdefault(q, []).append(nid)
+                    if d.kind == "function":
+                        g.fn[nid] = dict(free=set(d.rhs["free"]), ns=ns, file=f["rel"], name=q)
                 owners.append(nid)
             owner_ids = owners or [f["id"]]
             lam_nodes = []
@@ -158,14 +163,20 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         _resolve(g, r, defs_index, builtins, files)
     for c in run.crashes:
         g.diagnostics.append(dict(file=None, line=None, error=c, text=""))
-    for f in files:
-        pass
+    dyn_meta = None
+    if execute:
+        from .dynamic import run_all
+        from .merge import merge
+
+        nss = sorted({m.group(0) for q in defs_index if (m := re.match(r"^\.[^.]+(?:\.[^.]+)*(?=\.[^.]+$)", q))})
+        dyn = run_all(files, g.imports, nss, base, timeout=timeout, backend=backend)
+        dyn_meta = merge(g, files, dyn, defs_index)
     return dict(
         nodes=list(g.nodes.values()),
         edges=list(g.edges.values()),
         enrichment_queue=g.queue,
         meta=dict(root=str(base), files=len(files), skipped=[dict(file=str(p), reason=r) for p, r in disc.skipped],
-                  diagnostics=g.diagnostics, qver=run.qver, tier="S", statements=len(texts)),
+                  diagnostics=g.diagnostics, qver=run.qver, tier="S+D" if execute else "S", statements=len(texts), dynamic=dyn_meta),
     )  # fmt: skip
 
 
@@ -195,6 +206,7 @@ def _import(g, f, arg, line, files, base, rel_to_file):
             continue
         if rel in rel_to_file:
             g.edge(f["id"], rel_to_file[rel]["id"], "imports", "S", f"system \"l {arg}\" -> {rel}", f["rel"], line)
+            g.imports.setdefault(f["rel"], []).append(rel)
             return
     g.queue.append(dict(**{"from": f["id"]}, name=arg, reason="unresolved import", file=f["rel"], line=line))
 
@@ -211,11 +223,11 @@ def _resolve(g: Graph, r: dict, defs_index, builtins, files):
             if nid not in g.nodes:
                 g.node(nid, q, "variable", r["file"], r["line"], "S-indirect", "global assigned inside a function; no top-level definition")
                 defs_index.setdefault(q, []).append(nid)
-            g.edge(r["owner"], nid, rel, "S", f"{r['name']} assigned (global write)", r["file"], r["line"])
+            g.edge(r["owner"], nid, rel, "S", f"{r['name']} assigned (global write)", r["file"], r["line"], raw=r["name"])
             return
         nid = make_id("<external>", q)
         g.node(nid, q, "external", None, None, "S-unresolved", "referenced but not defined in the analysed code")
-        g.edge(r["owner"], nid, rel, "S-unresolved", f"{q} not defined anywhere", r["file"], r["line"])
+        g.edge(r["owner"], nid, rel, "S-unresolved", f"{q} not defined anywhere", r["file"], r["line"], raw=r["name"])
         g.queue.append(dict(**{"from": r["owner"]}, name=q, reason="unresolved reference", file=r["file"], line=r["line"]))
         return
     same_file = [c for c in cands if g.nodes[c]["file"] == r["file"]]
@@ -232,7 +244,7 @@ def _resolve(g: Graph, r: dict, defs_index, builtins, files):
             t, e = "S-indirect", e + "; target is a non-lambda definition (indirect)"
         if r["role"] == USES and node["kind"] == "variable":
             node["kind"] = "table"
-        g.edge(r["owner"], c, rel, t, e, r["file"], r["line"])
+        g.edge(r["owner"], c, rel, t, e, r["file"], r["line"], raw=r["name"])
 
 
 def write_outputs(result: dict, out: str | Path) -> None:

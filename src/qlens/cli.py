@@ -17,6 +17,10 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--execute", action="store_true", help="dynamic pass (M4)")
     b.add_argument("--backend", choices=["docker", "sandbox-exec"])
     b.add_argument("--timeout", type=float, default=60)
+    ms = sub.add_parser("measure", help="one JSON line of static-vs-dynamic agreement for a repo (runs q on its code, sandboxed)")
+    ms.add_argument("root")
+    ms.add_argument("--backend", choices=["docker", "sandbox-exec"])
+    ms.add_argument("--timeout", type=float, default=30)
     e = sub.add_parser("eval", help="precision/recall against a truth file")
     e.add_argument("root")
     e.add_argument("truth")
@@ -27,6 +31,11 @@ def main(argv: list[str] | None = None) -> int:
         write_outputs(res, a.out)
         d = len(res["meta"]["diagnostics"])
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges, {len(res['enrichment_queue'])} queued, {d} diagnostics -> {a.out}")
+        return 0
+    if a.cmd == "measure":
+        res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout)
+        dyn = {k: v for k, v in res["meta"]["dynamic"].items() if k != "load_results"}
+        print(json.dumps(dict(root=a.root, **dyn)))
         return 0
     if a.cmd == "eval":
         res = analyse(a.root, backend=a.backend)

@@ -86,6 +86,7 @@ def docker_command(
     image: str,
     uid: int | None = None,
     gid: int | None = None,
+    cwd: Path | None = None,
 ) -> list[str]:
     """Linux: docker run with no network, read-only fs, caps dropped; workspace/q/licence mounted
     read-only at their host paths and one writable temp bind."""
@@ -107,7 +108,7 @@ def docker_command(
     for var in ("QHOME", "QLIC"):
         if os.environ.get(var):
             cmd += ["-e", f"{var}={os.environ[var]}"]
-    cmd += ["-w", str(write_dir), image, str(q_bin), *q_args]
+    cmd += ["-w", str(cwd or write_dir), image, str(q_bin), *q_args]
     return cmd
 
 
@@ -118,6 +119,7 @@ def run_q(
     timeout: float = 60,
     backend: str | None = None,
     image: str | None = None,
+    cwd: Path | None = None,
 ) -> RunResult:
     """Run `q <q_args>` sandboxed. write_dir must exist; it is the only writable path."""
     backend = backend or os.environ.get("QLENS_BACKEND") or default_backend()
@@ -134,13 +136,13 @@ def run_q(
     elif backend == "docker":
         image = image or os.environ.get("QLENS_IMAGE") or "debian:stable-slim"
         name = f"qlens-{uuid.uuid4().hex[:10]}"
-        cmd = docker_command(q_bin, read_paths, write_dir, q_args, name, image)
+        cmd = docker_command(q_bin, read_paths, write_dir, q_args, name, image, cwd=cwd)
     else:
         raise SandboxError(f"unknown backend {backend!r}")
     try:
         cp = subprocess.run(
             cmd, capture_output=True, text=True, errors="replace", timeout=timeout,
-            stdin=subprocess.DEVNULL, cwd=write_dir,
+            stdin=subprocess.DEVNULL, cwd=cwd or write_dir,
         )  # fmt: skip
         return RunResult(cp.returncode, cp.stdout, cp.stderr, False)
     except subprocess.TimeoutExpired as e:

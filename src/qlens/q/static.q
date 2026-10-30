@@ -19,7 +19,7 @@
  if[not (0h=type v)&4<=count v; :`k`v!(`fn;s)];
  b:.ql.body s;
  bt:$[0=count b; `k`v!(`fn;"::"); .ql.enc parse b];
- `k`src`params`locals`free`body!(`lam;s;string each v 1;string each v 2;string each (v 3) except `;bt)}
+ `k`src`params`locals`free`body!(`lam;s;string each v 1;string each v 2;string each (1_v 3) except `;bt)}
 
 .ql.enc:{[t]
  ty:type t;
@@ -33,7 +33,7 @@
    `k`v!(`lit;.ql.s1 t)]}
 
 / free global names of a statement, computed by wrapping it as a niladic lambda
-.ql.topfree:{[txt] @[{string each ((value parse "{[]",x,"\n}") 3) except `};txt;{()}]}
+.ql.topfree:{[txt] @[{string each (1_(value parse "{[]",x,"\n}") 3) except `};txt;{()}]}
 
 .ql.one:{[r]
  i:"j"$r`i; t:(),r`t;
