@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+corpora/*
+!corpora/MANIFEST.json
+*.egg-info/
+graphify-out/
