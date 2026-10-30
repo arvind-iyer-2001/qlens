@@ -238,8 +238,22 @@ def _resolve(g: Graph, r: dict, defs_index, builtins, files):
 def write_outputs(result: dict, out: str | Path) -> None:
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    report = dict(counts=dict(nodes=len(result["nodes"]), edges=len(result["edges"]), enrichment=len(result["enrichment_queue"])),
-                  meta=result["meta"], enrichment_queue=result["enrichment_queue"])  # fmt: skip
+    from collections import Counter
+
+    report = dict(
+        counts=dict(
+            nodes=len(result["nodes"]),
+            edges=len(result["edges"]),
+            enrichment=len(result["enrichment_queue"]),
+            diagnostics=len(result["meta"]["diagnostics"]),
+            edges_by_relation=dict(Counter(e["relation"] for e in result["edges"])),
+            edges_by_tier=dict(Counter(e["tier"] for e in result["edges"])),
+            edges_by_confidence=dict(Counter(e["confidence"] for e in result["edges"])),
+            nodes_by_kind=dict(Counter(n["kind"] for n in result["nodes"])),
+        ),
+        meta=result["meta"],
+        enrichment_queue=result["enrichment_queue"],
+    )
     graph = {k: result[k] for k in ("nodes", "edges", "enrichment_queue")} | {"meta": {k: v for k, v in result["meta"].items() if k not in ("diagnostics",)}}
     (out / "graph.json").write_text(json.dumps(graph, indent=1))
     (out / "report.json").write_text(json.dumps(report, indent=1))

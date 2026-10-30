@@ -53,3 +53,12 @@ def test_docker_flags():
                  "--user 1000:1000", "--tmpfs /tmp", "--name n1", "-v /work:/work:ro", "-v /tmp/w:/tmp/w:rw"):  # fmt: skip
         assert flag in j, flag
     assert cmd[-3:] == ["img", "/opt/q/bin/q", "s.q"]
+
+
+def test_scoring_labels_and_calibration():
+    from qlens.scoring import DEFAULT_SCORES, TIERS, label
+
+    assert set(DEFAULT_SCORES) == set(TIERS)
+    assert label(0.9) == "EXTRACTED" and label(0.89) == "INFERRED" and label(0.5) == "INFERRED" and label(0.49) == "AMBIGUOUS"
+    assert label(DEFAULT_SCORES["S"]) == "EXTRACTED" and label(DEFAULT_SCORES["S-indirect"]) == "INFERRED"
+    assert label(DEFAULT_SCORES["S-unresolved"]) == "AMBIGUOUS"
