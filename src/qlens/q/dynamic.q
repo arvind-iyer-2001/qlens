@@ -39,6 +39,8 @@
  if[100h=ty;
   r:@[value;v;()];
   if[(0h=type r)&4<=count r; d,:`params`locals`free`ctx`free_all!(string each r 1;string each r 2;string each (1_r 3) except `;string first r 3;string each .dy.allfree v)]];
+ / a dictionary variable holds names too: `lin.send:{..}` at the root makes `lin` a dict, and `lin.send` resolves through its keys
+ if[99h=ty; k:@[key;v;()]; if[11h=type k; d,:enlist[`keys]!enlist string each 500#k where not null k]];
  d}
 
 .dy.done:0b;

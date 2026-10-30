@@ -152,4 +152,9 @@ Dev run 7 (after the fix; dev split only):
   `k)` definitions and state created inside functions (quantQ's test files create framework state; kdb-taq defines `o,F,S,dst,D` on a `k)` line).
   These are gaps in the static pass's view of definitions, not wrong edges. Files that call `exit` before finishing (43 in amber's bench)
   are reported as "exited before the file finished loading": names defined before the exit are confirmed, nothing after it is judged.
-- One file in q-evm stopped loading (3 -> 2 loaded files); cause not yet identified (use `qlens measure --load-results`).
+- q-evm 3 -> 2 loaded files: per-file results (`--load-results`) show 2 of 8 load; 3 stop on `'assign` (keyword assignment, the q 5 limit),
+  `globals.q` on `hopen` of a unix socket, others on network or a missing path. Which file loaded before is not identified.
+- Cause found for the refuted definitions (88 in run 6, 90 in run 7: kdbx-modules, kdbslack, peachq, jupyterq, ...): a name like `lin.sendevent:{..}`
+  at the root makes `lin` a dictionary variable, and `lin.sendevent` resolves through its keys. The snapshot saw only `lin`, so correct
+  definitions were marked S-refuted (confidence 0.10). Fixed in the merge: a static name that is a key of a live dictionary is confirmed
+  (evidence says so); a name that is not a key is still refuted (tested both ways). Effect not yet measured (dev run 8 pending).

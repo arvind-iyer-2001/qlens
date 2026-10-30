@@ -16,6 +16,15 @@ def _set(obj: dict, tier: str, extra: str) -> None:
     obj["evidence"] = f"{obj['evidence']}; {extra}"
 
 
+def _dict_key_of(q: str, defs: dict) -> str | None:
+    """The live dictionary that `q` resolves through (`lin.send` is key `send` of the dict `lin`), else None."""
+    head, dot, key = q.rpartition(".")
+    info = defs.get(head) if dot and head else None
+    if info is not None and info["type"] == 99 and key in info.get("keys", ()):
+        return head
+    return None
+
+
 def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
     m = dict(
         files_loaded=0, files_failed=0, files_process_failed=0,
@@ -48,10 +57,14 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
             q = n["label"]
             static_q.add(q)
             info = dr.defs.get(q)
+            via = _dict_key_of(q, dr.defs) if info is None else None
             if info is not None:
                 _set(n, "D2", f"confirmed after load (q type {info['type']})")
                 if info["type"] == 100 and n["kind"] == "variable":
                     n["kind"] = "function"
+                m["defs_agree"] += 1
+            elif via is not None:
+                _set(n, "D2", f"confirmed after load (a key of the dictionary {via})")
                 m["defs_agree"] += 1
             elif dr.loaded and IMPLICIT not in n["evidence"] and n["id"] not in g.cond:
                 _set(n, "S-refuted", "file loaded in q but this name does not exist afterwards")

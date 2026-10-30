@@ -156,3 +156,24 @@ def test_load_error_text_and_early_exit_are_reported(tmp_path):
     n = _nodes(r)
     assert n["a"]["tier"] == "D2" and n["e1"]["tier"] == "D2"  # defined before the stop
     assert n["c"]["tier"] != "D2" and n["e2"]["tier"] != "D2"  # never reached
+
+
+@needs_q
+def test_names_that_resolve_through_a_dictionary_are_confirmed_not_refuted(tmp_path):
+    """Regression: `lin.send:{..}` at the root makes `lin` a dict; the static name `lin.send` exists via its keys,
+    but the snapshot only sees `lin` and the name was called refuted (30 definitions in kdbx-modules alone)."""
+    (tmp_path / "a.q").write_text("lin.send:{x}\nlin.more:{lin.send x}\nwin.send:{x}\ncfg:`a`b!1 2\n")
+    r = analyse(tmp_path, execute=True)
+    d = r["meta"]["dynamic"]
+    assert d["defs_refuted"] == 0, d["examples"]
+    n = _nodes(r)
+    assert n["lin.send"]["tier"] == "D2" and n["win.send"]["tier"] == "D2" and "key of the dictionary lin" in n["lin.send"]["evidence"]
+    assert d["defs_missed"] == 0, d["examples"]  # the keys of the data dict `cfg` are not names it defined
+
+
+@needs_q
+def test_a_name_that_is_not_a_key_of_the_dict_is_still_refuted(tmp_path):
+    (tmp_path / "a.q").write_text("lin.send:{x}\nif[0b;lin.gone:{x}]\nlin:delete send from lin\n")
+    r = analyse(tmp_path, execute=True)
+    n = _nodes(r)
+    assert n["lin.send"]["tier"] == "S-refuted"
