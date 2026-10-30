@@ -96,3 +96,14 @@ What the edge metric does and does not show: it compares static references with 
 come from q's compiler, so agreement on a function body is expected. It does not test that a name is bound to the right
 definition when several exist. Coverage: 948 of 2070 files loaded; the other files are not judged.
 The test split has not been run. Run 4 is the dev result to report; do not tune on the test split.
+
+### Cause analysis of dev run 4 definition gaps (examples from puzzle_solutions, quantQ, peachq)
+
+- peachq (72 refuted defs): `system "d .pkg";` with a trailing `;` did not match the namespace-switch detector, so
+  functions were filed under the wrong name. Fixed.
+- puzzle_solutions genarch (refuted `.genarch.state:(::)` etc.): q's `\v` omits variables whose value is `::`; the live
+  listing now uses `key`. Fixed.
+- quantQ tests / puzzle_solutions arch1 (missed defs): names defined in OTHER files that the target loads through a computed
+  path (`system "l ",.qt.libDir,"/",x`). They are counted as `defs_elsewhere`, and the real dependency q revealed is added as a
+  D2 `imports` edge. Names built at runtime with `(` sv fullNs,`addInput) set ...` that exist in no file remain genuinely
+  invisible to a static pass and stay in `defs_missed`.

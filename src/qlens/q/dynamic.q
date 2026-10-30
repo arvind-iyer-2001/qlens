@@ -8,7 +8,8 @@
 .dy.snap:{[nss]
  out:()!();
  {[nss;ns] 
-  nm:distinct (@[system;"v ",string ns;()]),@[system;"f ",string ns;()];
+  / key lists every name; `system "v"` omits variables whose value is :: (generic null)
+  nm:distinct @[key;ns;()];
   nm:nm where not null nm;
   {[ns;n] q:.dy.qn[ns;n]; `.dy.cur set .dy.cur,enlist[q]!enlist .dy.sig @[get;q;()]}[ns] each nm
  }[nss] each nss;

@@ -15,7 +15,7 @@ from .splitter import split_statements
 from .static_pass import run_static
 
 BUILTIN_PREFIXES = (".q.", ".Q.", ".j.", ".h.", ".z.", ".o.")
-_SYSTEM = re.compile(r'^system\s*"((?:[^"\\]|\\.)*)"\s*$', re.S)
+_SYSTEM = re.compile(r'^system\s*"((?:[^"\\]|\\.)*)"\s*;?\s*$', re.S)
 
 
 def _slug(s: str) -> str:

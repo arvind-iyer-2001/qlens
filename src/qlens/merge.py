@@ -19,10 +19,11 @@ def _set(obj: dict, tier: str, extra: str) -> None:
 def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
     m = dict(
         files_loaded=0, files_failed=0, files_process_failed=0,
-        defs_agree=0, defs_refuted=0, defs_missed=0,
+        defs_agree=0, defs_refuted=0, defs_missed=0, defs_elsewhere=0,
         agree=0, refuted=0, missed=0, indirect=0, indirect_agree=0, indirect_refuted=0, dangling=0, ns_mismatch=0,
     )  # fmt: skip
     m["examples"] = []
+    by_rel = {f["rel"]: f for f in files}
     load_results = []
     out_edges: dict[str, list[tuple]] = {}
     for k, e in g.edges.items():
@@ -59,6 +60,14 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
                     m["examples"].append(dict(kind="def_refuted", file=rel, name=q, line=n["line"], static_kind=n["kind"], evidence=n["evidence"][:140],
                                               live_names_sample=sorted(dr.defs)[:15]))  # fmt: skip
         for q, info in dr.defs.items():
+            elsewhere = sorted({g.nodes[c]["file"] for c in defs_index.get(q, []) if g.nodes[c]["file"] not in (rel, None)})
+            if q not in static_q and elsewhere:
+                # defined by a file this one loaded at runtime (computed `\l` path, `set` ...): a real dependency, not a miss
+                m["defs_elsewhere"] += 1
+                if len(elsewhere) == 1 and elsewhere[0] in by_rel:
+                    other = by_rel[elsewhere[0]]
+                    g.edge(f["id"], other["id"], "imports", "D2", f"{q} became defined while loading {rel}; defined in {elsewhere[0]} (runtime load)", rel, None)
+                continue
             container = info["type"] == 99 and any(o.startswith(q + ".") for o in [*static_q, *dr.defs])
             if q not in static_q and not container:  # a namespace/dict holding other names is not a missed definition
                 m["defs_missed"] += 1

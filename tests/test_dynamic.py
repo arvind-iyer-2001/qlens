@@ -113,3 +113,19 @@ def test_namespace_same_name_variable_and_container_and_redefinition(tmp_path):
     d = r["meta"]["dynamic"]
     assert d["refuted"] == 0, d["examples"]
     assert d["defs_missed"] == 0, d["examples"]  # .pm.auth is a container for .pm.auth.ldap
+
+
+@needs_q
+def test_null_valued_variables_and_trailing_semicolon_and_runtime_load(tmp_path):
+    (tmp_path / "g.q").write_text('system "d .pk";\nlg:{x}\nstate:(::)\nvals:5\n')
+    (tmp_path / "lib.q").write_text("libfn:{x}\n")
+    (tmp_path / "t.q").write_text('p:"lib.q";\nrun:{system "l ",p};\nrun[]\n')
+    r = analyse(tmp_path, execute=True)
+    n = {x["label"]: x for x in r["nodes"]}
+    assert ".pk.lg" in n and ".pk.state" in n  # namespace switch with trailing ; applied
+    d = r["meta"]["dynamic"]
+    assert d["defs_refuted"] == 0, d["examples"]  # `state:(::)` exists although \v omits it
+    assert d["defs_missed"] == 0 and d["defs_elsewhere"] >= 1, d["examples"]
+    lab = {x["id"]: x["label"] for x in r["nodes"]}
+    imps = {(lab[e["source"]], lab[e["target"]]) for e in r["edges"] if e["relation"] == "imports"}
+    assert ("t.q", "lib.q") in imps  # the dependency q revealed
