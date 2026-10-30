@@ -1,0 +1,22 @@
+[project]
+name = "qlens"
+version = "0.1.0"
+description = "Knowledge graph of q/kdb+ source, using q itself as the parser"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+qlens = "qlens.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qlens"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

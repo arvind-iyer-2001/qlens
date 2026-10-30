@@ -4,3 +4,5 @@ corpora/*
 !corpora/MANIFEST.json
 *.egg-info/
 graphify-out/
+.serena/
+out/
