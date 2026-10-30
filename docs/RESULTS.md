@@ -32,3 +32,12 @@ Before foreign-block handling the statement failure rate was 2.2% (793 of 36,555
 
 Commands for Arvind: `uv run qlens corpus corpora --split dev --jobs 4 --timeout 600 --out out/dev1.jsonl`,
 then `uv run qlens summary out/dev1.jsonl`. Run the test split once at the end.
+
+## Dev run 1 (out/dev1.jsonl, 116 dev repos, code at f7e6ba0) — superseded, do not mix with later runs
+
+precision 0.7505 (agree 9194, refuted 3056), recall 0.9992 (missed 7), per-repo precision median 0.884,
+p10 0.536. 948 files loaded, 1122 failed to load, 48 process failures. Far below the 98.5% target.
+Cause found by analysis: the live comparison used the outer function's `value` free list, which omits names used
+only inside nested lambdas, so edges from nested lambdas were marked refuted. This is a measurement bug, fixed
+in the commit after f7e6ba0 (static and live sides both use outer + nested free names). Run 2 is needed to see
+what remains. Other refuted sources are not yet known.
