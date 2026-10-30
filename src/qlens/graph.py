@@ -171,12 +171,21 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         nss = sorted({m.group(0) for q in defs_index if (m := re.match(r"^\.[^.]+(?:\.[^.]+)*(?=\.[^.]+$)", q))})
         dyn = run_all(files, g.imports, nss, base, timeout=timeout, backend=backend)
         dyn_meta = merge(g, files, dyn, defs_index)
+    per_file: dict[str, list[int]] = {}
+    for d in g.diagnostics:
+        if d.get("file"):
+            per_file.setdefault(d["file"], [0])[0] += 1
+    suspect = [
+        dict(file=f["rel"], failed=per_file[f["rel"]][0], statements=len(f["stmts"]))
+        for f in files
+        if f["rel"] in per_file and len(f["stmts"]) >= 5 and per_file[f["rel"]][0] / len(f["stmts"]) > 0.5
+    ]  # most statements unparseable: probably k syntax or not q
     return dict(
         nodes=list(g.nodes.values()),
         edges=list(g.edges.values()),
         enrichment_queue=g.queue,
         meta=dict(root=str(base), files=len(files), skipped=[dict(file=str(p), reason=r) for p, r in disc.skipped],
-                  diagnostics=g.diagnostics, qver=run.qver, tier="S+D" if execute else "S", statements=len(texts), dynamic=dyn_meta),
+                  diagnostics=g.diagnostics, qver=run.qver, tier="S+D" if execute else "S", statements=len(texts), dynamic=dyn_meta, suspect_files=suspect),
     )  # fmt: skip
 
 

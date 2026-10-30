@@ -1,0 +1,14 @@
+{
+ "KxSystems/kdb": {
+  "commit": "1daebf73349199b1318649fc2c5656cab2b4a7f2",
+  "dir": "KxSystems__kdb",
+  "q_files": 46,
+  "stars": 474
+ },
+ "sambacha/q-evm": {
+  "commit": "c6d460069a7f9c7a3b452fa77e5654725943238a",
+  "dir": "sambacha__q-evm",
+  "q_files": 8,
+  "stars": 419
+ }
+}

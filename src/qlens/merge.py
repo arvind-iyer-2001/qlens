@@ -20,7 +20,7 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
     m = dict(
         files_loaded=0, files_failed=0, files_process_failed=0,
         defs_agree=0, defs_refuted=0, defs_missed=0,
-        agree=0, refuted=0, missed=0, indirect=0, dangling=0, ns_mismatch=0,
+        agree=0, refuted=0, missed=0, indirect=0, indirect_agree=0, indirect_refuted=0, dangling=0, ns_mismatch=0,
     )  # fmt: skip
     load_results = []
     out_edges: dict[str, list[tuple]] = {}
@@ -86,9 +86,12 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
                 if raws & dfree:
                     if e["tier"] == "S-indirect":
                         m["indirect"] += 1
+                        m["indirect_agree"] += 1
                     _set(e, "D3", "confirmed by value of the loaded function")
                     m["agree"] += 1
                 elif raws:
+                    if e["tier"] == "S-indirect":
+                        m["indirect_refuted"] += 1
                     _set(e, "S-refuted", "name absent from the free names of the live function")
                     m["refuted"] += 1
             m["missed"] += len(dfree - fi["free"])

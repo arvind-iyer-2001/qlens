@@ -59,3 +59,8 @@ def test_blank_lines_and_whitespace_only():
 
 def test_crlf():
     assert texts("a:1\r\nb:2\r\n") == [("a:1", 1, 1), ("b:2", 2, 2)]
+
+
+def test_shebang_line_skipped():
+    assert texts("#!/usr/bin/env q\na:1\n") == [("a:1", 2, 2)]
+    assert texts("a:1\n#!notshebang\n") == [("a:1", 1, 1), ("#!notshebang", 2, 2)]

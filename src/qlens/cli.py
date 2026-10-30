@@ -26,6 +26,19 @@ def main(argv: list[str] | None = None) -> int:
     ms.add_argument("root")
     ms.add_argument("--backend", choices=["docker", "sandbox-exec"])
     ms.add_argument("--timeout", type=float, default=30)
+    c = sub.add_parser("corpus", help="resumable corpus run, one subprocess per repo")
+    c.add_argument("corpora")
+    c.add_argument("--split", choices=["dev", "test", "all"], default="dev")
+    c.add_argument("--jobs", type=int, default=2)
+    c.add_argument("--timeout", type=float, default=600)
+    c.add_argument("--out", required=True)
+    c.add_argument("--backend", choices=["docker", "sandbox-exec"])
+    cal = sub.add_parser("calibrate", help="refit calibration.json from DEV results")
+    cal.add_argument("results")
+    cal.add_argument("--out", default="src/qlens/calibration.json")
+    sm = sub.add_parser("summary", help="precision/recall summary of a results file")
+    sm.add_argument("results")
+    sm.add_argument("--split", default="dev", choices=["dev", "test", "all"])
     e = sub.add_parser("eval", help="precision/recall against a truth file")
     e.add_argument("root")
     e.add_argument("truth")
@@ -36,6 +49,29 @@ def main(argv: list[str] | None = None) -> int:
         write_outputs(res, a.out)
         d = len(res["meta"]["diagnostics"])
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges, {len(res['enrichment_queue'])} queued, {d} diagnostics -> {a.out}")
+        return 0
+    if a.cmd == "corpus":
+        from pathlib import Path
+
+        from .corpus import run_corpus
+
+        n = run_corpus(Path(a.corpora), a.split, a.jobs, a.timeout, Path(a.out), a.backend)
+        print(f"ran {n} repos -> {a.out}")
+        return 0
+    if a.cmd == "calibrate":
+        from pathlib import Path
+
+        from .corpus import calibrate
+
+        print(json.dumps(calibrate(Path(a.results), Path(a.out)), indent=2))
+        return 0
+    if a.cmd == "summary":
+        from pathlib import Path
+
+        from .corpus import summarise
+
+        sp = ("dev", "test") if a.split == "all" else (a.split,)
+        print(json.dumps(summarise(Path(a.results), sp), indent=2))
         return 0
     if a.cmd == "export":
         from pathlib import Path

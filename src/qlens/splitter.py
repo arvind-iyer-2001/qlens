@@ -67,6 +67,8 @@ def split_statements(source: str) -> list[Statement]:
 
     for no, raw in enumerate(source.splitlines(), start=1):
         line = raw.rstrip("\r")
+        if no == 1 and line.startswith("#!"):
+            continue  # shebang line, ignored by q's loader
         if in_block:
             if line.rstrip() == "\\":
                 in_block = False
