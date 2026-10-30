@@ -17,6 +17,11 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--execute", action="store_true", help="dynamic pass (M4)")
     b.add_argument("--backend", choices=["docker", "sandbox-exec"])
     b.add_argument("--timeout", type=float, default=60)
+    x = sub.add_parser("export", help="write a graphify-shaped AST-style JSON (nodes/edges) for q files")
+    x.add_argument("source", help="a q directory/file, or an existing graph.json")
+    x.add_argument("--out", required=True, help="output .json path")
+    x.add_argument("--format", choices=["graphify"], default="graphify")
+    x.add_argument("--backend", choices=["docker", "sandbox-exec"])
     ms = sub.add_parser("measure", help="one JSON line of static-vs-dynamic agreement for a repo (runs q on its code, sandboxed)")
     ms.add_argument("root")
     ms.add_argument("--backend", choices=["docker", "sandbox-exec"])
@@ -31,6 +36,18 @@ def main(argv: list[str] | None = None) -> int:
         write_outputs(res, a.out)
         d = len(res["meta"]["diagnostics"])
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges, {len(res['enrichment_queue'])} queued, {d} diagnostics -> {a.out}")
+        return 0
+    if a.cmd == "export":
+        from pathlib import Path
+
+        from .export import to_graphify
+
+        src = Path(a.source)
+        graph = json.loads(src.read_text()) if src.is_file() and src.suffix == ".json" else analyse(src, backend=a.backend)
+        res = to_graphify(graph)
+        Path(a.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.out).write_text(json.dumps(res, indent=2, ensure_ascii=False))
+        print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges -> {a.out}")
         return 0
     if a.cmd == "measure":
         res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout)
