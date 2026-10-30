@@ -12,6 +12,9 @@ qlens extracts a q/kdb+ knowledge graph deterministically (no LLM, no tree-sitte
 - Branch `plugin-extractors` (1 commit, NOT pushed): `graphify/plugins.py` plugin system (entry-point group `graphify.extractors`, `GRAPHIFY_PLUGINS`, per-file or batch, validated output, no fallback), wired into detect/extract/cache salt/watch, `graphify plugins` command, `docs/PLUGINS.md`, 31 tests. Baseline note: 2 tests in `test_extractor_scan_root_context.py` fail on untouched v8 when run after other files (order-dependent, not ours).
 - qlens side: `src/qlens/graphify_plugin.py` (plain dict, no graphify import) + entry point in `pyproject.toml`. Verified end to end: `uv pip install -e /Users/arvindiyer/qlens --python ~/development/graphify/.venv/bin/python`, then `graphify plugins`.
 
+## Next for qlens (loaded rate)
+- Only ~46% of files load in q, so the rest is never judged. `qlens measure` and `qlens summary` now record WHY files stop loading (`load_causes`: cause -> [files, sample error, sample file]). Next step needs Arvind: re-run the dev corpus (README command), then `qlens summary` and read `load_causes`; design stubs (hopen, missing files, env) from the top causes. The test split stays untouched; any change made after seeing test data must be reported as such.
+
 ## In progress
 - Background fetch of up to 250 public q repos into `corpora/` (gitignored; `corpora/MANIFEST.json` lists them). Next: static-build all, error-analyse by cause, fix generally, record in `docs/RESULTS.md`.
 

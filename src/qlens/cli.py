@@ -90,6 +90,9 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "measure":
         res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout, log=_log)
         dyn = {k: v for k, v in res["meta"]["dynamic"].items() if k != "load_results"}
+        from .corpus import load_causes
+
+        dyn["load_causes"] = load_causes(res["meta"]["dynamic"].get("load_results", []))
         if a.examples:
             Path(a.examples).write_text(json.dumps(dyn.get("examples", []), indent=1))
             print(f"wrote {len(dyn.get('examples', []))} mismatch examples to {a.examples}", file=sys.stderr)

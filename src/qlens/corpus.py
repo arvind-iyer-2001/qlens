@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -122,6 +123,28 @@ def run_corpus(corpora: Path, split: str, jobs: int, timeout: float, out: Path, 
     return len(todo)
 
 
+def load_cause(error: str) -> str:
+    """Group q load errors by what went wrong, not by the particular name or path in the message."""
+    e = error.strip().lstrip("'").strip().lower()
+    if not e:
+        return "(no message)"
+    if "/" in e or re.search(r"\.(q|k|csv|txt|json|xml|yml|yaml|cfg|conf|log)\b", e):
+        return "missing or unreadable file"
+    return re.sub(r"\d+", "N", e)[:40]
+
+
+def load_causes(load_results: list[dict], top: int = 15) -> dict:
+    """{cause: [files, sample error, sample file]} for files that stopped loading, most common first."""
+    groups: dict[str, list] = {}
+    for r in load_results:
+        if r.get("loaded") or r.get("failure"):
+            continue
+        c = load_cause(r.get("error", ""))
+        g = groups.setdefault(c, [0, r.get("error", ""), r.get("file", "")])
+        g[0] += 1
+    return dict(sorted(groups.items(), key=lambda kv: -kv[1][0])[:top])
+
+
 def summarise(results: Path, splits: tuple[str, ...] = ("dev",)) -> dict:
     """Pooled precision/recall plus per-repo precision distribution and the biggest contributors to misses."""
     recs = [json.loads(x) for x in results.read_text().splitlines() if x.strip()]
@@ -131,7 +154,13 @@ def summarise(results: Path, splits: tuple[str, ...] = ("dev",)) -> dict:
     missed = sum(r["missed"] for r in recs)
     per_repo = sorted(r["agree"] / (r["agree"] + r["refuted"]) for r in recs if r["agree"] + r["refuted"] > 0)
     pct = lambda q: per_repo[min(len(per_repo) - 1, int(q * len(per_repo)))] if per_repo else None  # noqa: E731
+    pooled: dict[str, list] = {}
+    for r in recs:
+        for cause, (n, sample, where) in r.get("load_causes", {}).items():
+            g = pooled.setdefault(cause, [0, sample, f"{r['repo']}/{where}"])
+            g[0] += n
     return dict(
+        load_causes=dict(sorted(pooled.items(), key=lambda kv: -kv[1][0])[:15]),
         repos=len(recs), agree=agree, refuted=refuted, missed=missed,
         precision=agree / (agree + refuted) if agree + refuted else None,
         recall=agree / (agree + missed) if agree + missed else None,

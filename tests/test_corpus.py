@@ -61,3 +61,29 @@ def test_measure_examples_cli(tmp_path):
     ex = tmp_path / "ex.json"
     assert main(["measure", str(tmp_path), "--examples", str(ex)]) == 0
     assert json.loads(ex.read_text()) == []  # nothing disputed in clean code
+
+
+def test_load_causes_group_by_what_went_wrong_not_by_name():
+    from qlens.corpus import load_cause, load_causes
+
+    assert load_cause("'./data/prices.csv") == load_cause("'/tmp/x/other.q") == "missing or unreadable file"
+    assert load_cause("'hopen") == "hopen"
+    assert load_cause("'type") != load_cause("'rank")
+    assert load_cause("") == "(no message)"
+    rows = [
+        dict(file="a.q", loaded=False, error="'hopen", failure=None),
+        dict(file="b.q", loaded=False, error="'hopen", failure=None),
+        dict(file="c.q", loaded=False, error="'./cfg/x.q", failure=None),
+        dict(file="d.q", loaded=True, error="", failure=None),
+        dict(file="e.q", loaded=False, error="", failure="timeout"),  # process problem: not a load error
+    ]
+    got = load_causes(rows)
+    assert got == {"hopen": [2, "'hopen", "a.q"], "missing or unreadable file": [1, "'./cfg/x.q", "c.q"]}
+
+
+def test_summary_pools_load_causes_across_repos(tmp_path):
+    res = tmp_path / "r.jsonl"
+    a = _rec("a", "dev", 10, 0, 0) | {"load_causes": {"hopen": [2, "'hopen", "x.q"]}}
+    b = _rec("b", "dev", 10, 0, 0) | {"load_causes": {"hopen": [1, "'hopen", "y.q"], "type": [4, "'type", "z.q"]}}
+    res.write_text("\n".join(json.dumps(r) for r in (a, b)))
+    assert summarise(res, ("dev",))["load_causes"] == {"type": [4, "'type", "b/z.q"], "hopen": [3, "'hopen", "a/x.q"]}
