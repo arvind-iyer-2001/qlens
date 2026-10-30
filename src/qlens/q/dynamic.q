@@ -19,13 +19,21 @@
  distinct `.,(extra,((key `) except .dy.skipns) except vars) except `}
 .dy.nsfix:{[x] $[(first string x)="."; x; `$".",string x]}
 
+/ free names of a lambda and of every lambda nested inside it (value of the outer omits the inner ones)
+.dy.allfree:{[v]
+ r:@[value;v;()];
+ if[not (0h=type r)&4<=count r; :()];
+ own:(1_r 3) except `;
+ inner:raze .z.s each (4_ -1_ r) where 100h=type each 4_ -1_ r;
+ distinct own,inner}
+
 .dy.info:{[q]
  v:@[get;q;()];
  ty:type v;
  d:`name`type!(string q;ty);
  if[100h=ty;
   r:@[value;v;()];
-  if[(0h=type r)&4<=count r; d,:`params`locals`free`ctx!(string each r 1;string each r 2;string each (1_r 3) except `;string first r 3)]];
+  if[(0h=type r)&4<=count r; d,:`params`locals`free`ctx`free_all!(string each r 1;string each r 2;string each (1_r 3) except `;string first r 3;string each .dy.allfree v)]];
  d}
 
 .dy.done:0b;

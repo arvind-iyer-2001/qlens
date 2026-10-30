@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .classify import CALL, READ, USES, WRITE, classify, find_defs
+from .classify import CALL, READ, USES, WRITE, all_free, classify, find_defs
 from .discovery import discover
 from .scoring import DEFAULT_SCORES, label
 from .splitter import split_statements
@@ -152,7 +152,7 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
                     g.edge(f["id"], nid, "contains", "S", f"defined at {f['rel']}:{line}", f["rel"], line)
                     defs_index.setdefault(q, []).append(nid)
                     if d.kind == "function":
-                        g.fn[nid] = dict(free=set(d.rhs["free"]), ns=ns, file=f["rel"], name=q)
+                        g.fn[nid] = dict(free=all_free(d.rhs), ns=ns, file=f["rel"], name=q)
                 owners.append(nid)
             owner_ids = owners or [f["id"]]
             lam_nodes = []

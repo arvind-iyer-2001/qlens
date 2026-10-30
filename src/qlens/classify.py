@@ -153,3 +153,12 @@ def _indirect(rhs: dict) -> bool:
     if _fn(h) in ("?", "!", "+:", ",", "enlist", ":", "::"):
         return False
     return h["k"] in ("sym", "lam") or _is_kfn(h)
+
+
+def all_free(lam: dict) -> set[str]:
+    """Free names of a lambda plus those of every lambda nested inside it (q's `value` omits the inner ones)."""
+    out = set(lam["free"])
+    _, nested = classify(lam["body"], set(lam["free"]))
+    for n in nested:
+        out |= all_free(n)
+    return out

@@ -71,3 +71,11 @@ def test_run_file_reports_namespace_context(tmp_path):
     (tmp_path / "x.q").write_text("\\d .ns\nf:{x}\n")
     d = run_file(tmp_path / "x.q", [], [".ns"], tmp_path, tmp_path)
     assert d.loaded and d.defs[".ns.f"]["ctx"] == "ns"
+
+
+@needs_q
+def test_nested_lambdas_are_not_refuted(tmp_path):
+    (tmp_path / "a.q").write_text("g:{x+1}\nouter:{{g x} each y}\ndeep:{{{g x} each y} each z}\n")
+    r = analyse(tmp_path, execute=True)
+    d = r["meta"]["dynamic"]
+    assert d["refuted"] == 0 and d["agree"] >= 2 and d["missed"] == 0

@@ -76,7 +76,7 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
             if ctx != fi["ns"]:
                 m["ns_mismatch"] += 1
                 g.diagnostics.append(dict(file=rel, line=None, error=f"namespace context: static {fi['ns'] or '.'} vs live {ctx or '.'} for {fi['name']}", text=""))
-            dfree = set(info["free"])
+            dfree = set(info.get("free_all") or info["free"])
             for key in out_edges.get(nid, []):
                 e = g.edges[key]
                 raws = g.raw.get(key, set())
