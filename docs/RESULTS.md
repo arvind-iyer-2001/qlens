@@ -60,3 +60,12 @@ are inspected (`qlens measure REPO --examples FILE`).
   `trim`) that appear as constants of user functions; the live side recursed into them. Fixed: only lambdas that are not
   `k)` lambdas are followed.
 - Runs 1-2 numbers above are therefore partly measurement error and are superseded; run 3 is needed.
+
+## Dev run 3 (out/dev3.jsonl, 116 dev repos, code at the commit "Fix spurious self-write edges...")
+
+Reference-edge precision 0.9862 (agree 9709, refuted 136), recall 0.9993 (missed 7), per-repo precision median 1.0,
+p10 0.917. 101 of 116 repos have zero refuted edges. Against the spec targets on dev: precision >= 98.5% met,
+recall >= 96% met, median 100% met, p10 >= 95% NOT met (0.917). Largest remaining refuted: TorQ 38, pykx 31, ws.q 15.
+Definitions: 10373 confirmed live, 196 refuted, 2291 defined at runtime that the static pass did not see (unexamined).
+Coverage caveat: 948 files loaded, 1122 failed to load (not judged), 48 process failures; the numbers describe the
+loadable subset. Test split not run. Indirect: 927 agree / 15 refuted. Namespace-context mismatches: 4.
