@@ -55,9 +55,14 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
             elif dr.loaded and IMPLICIT not in n["evidence"]:
                 _set(n, "S-refuted", "file loaded in q but this name does not exist afterwards")
                 m["defs_refuted"] += 1
+                if len([x for x in m["examples"] if x["kind"] == "def_refuted"]) < 12:
+                    m["examples"].append(dict(kind="def_refuted", file=rel, name=q, line=n["line"], static_kind=n["kind"], evidence=n["evidence"][:140],
+                                              live_names_sample=sorted(dr.defs)[:15]))  # fmt: skip
         for q, info in dr.defs.items():
             if q not in static_q:
                 m["defs_missed"] += 1
+                if len([x for x in m["examples"] if x["kind"] == "def_missed"]) < 12:
+                    m["examples"].append(dict(kind="def_missed", file=rel, name=q, live_type=info["type"], static_names_sample=sorted(static_q)[:15]))
                 from .graph import make_id
 
                 nid = make_id(rel, q)
