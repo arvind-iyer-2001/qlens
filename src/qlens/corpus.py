@@ -37,9 +37,18 @@ def _done(out: Path) -> set[str]:
 
 
 def run_corpus(corpora: Path, split: str, jobs: int, timeout: float, out: Path, backend: str | None = None) -> int:
-    todo = [p for p in repo_dirs(corpora, split) if p.name not in _done(out)]
+    every = repo_dirs(corpora, split)
+    todo = [p for p in every if p.name not in _done(out)]
     lock = threading.Lock()
     out.parent.mkdir(parents=True, exist_ok=True)
+    started = time.time()
+    state = dict(n=0, ok=0, bad=0, agree=0, refuted=0)
+
+    def say(msg: str) -> None:
+        print(msg, file=sys.stderr, flush=True)
+
+    say(f"corpus: split={split}, {len(every)} repos, {len(every) - len(todo)} already done (resuming), {len(todo)} to run, jobs={jobs}")
+    say(f"corpus: results append to {out}")
 
     def one(p: Path) -> None:
         t = time.time()
@@ -58,11 +67,58 @@ def run_corpus(corpora: Path, split: str, jobs: int, timeout: float, out: Path, 
         except json.JSONDecodeError as e:
             rec = dict(status="error", error=f"bad measure output: {e}")
         rec.update(repo=p.name, split=split_of(p.name), seconds=round(time.time() - t, 1))
-        with lock, out.open("a") as f:
-            f.write(json.dumps(rec) + "\n")
+        with lock:
+            with out.open("a") as f:
+                f.write(json.dumps(rec) + "\n")
+            state["n"] += 1
+            if rec["status"] == "ok":
+                state["ok"] += 1
+                state["agree"] += rec.get("agree", 0)
+                state["refuted"] += rec.get("refuted", 0)
+                detail = (
+                    f"files loaded {rec.get('files_loaded', 0)}/{rec.get('files_loaded', 0) + rec.get('files_failed', 0)}, "
+                    f"edges agree {rec.get('agree', 0)} refuted {rec.get('refuted', 0)} missed {rec.get('missed', 0)}"
+                )
+            else:
+                state["bad"] += 1
+                detail = rec.get("error", "")[:120].replace("\n", " ")
+            done_n = state["n"]
+            elapsed = time.time() - started
+            eta = elapsed / done_n * (len(todo) - done_n)
+            tot = state["agree"] + state["refuted"]
+            prec = f"{100 * state['agree'] / tot:.1f}%" if tot else "n/a"
+            say(
+                f"[{done_n}/{len(todo)}] {rec['status']:<7} {p.name}  {rec['seconds']}s  {detail}\n"
+                f"          running: ok {state['ok']} bad {state['bad']}, precision so far {prec}, "
+                f"elapsed {elapsed / 60:.1f}m, about {eta / 60:.1f}m left"
+            )
 
+    running: dict[str, float] = {}
+    stop = threading.Event()
+
+    def heartbeat() -> None:
+        while not stop.wait(60):
+            with lock:
+                now = time.time()
+                busy = ", ".join(f"{k} ({(now - v) / 60:.1f}m)" for k, v in running.items())
+            if busy:
+                say(f"  ... still running: {busy}")
+
+    def start(p: Path) -> None:
+        with lock:
+            running[p.name] = time.time()
+        say(f"  starting {p.name} ...")
+        try:
+            one(p)
+        finally:
+            with lock:
+                running.pop(p.name, None)
+
+    threading.Thread(target=heartbeat, daemon=True).start()
     with ThreadPoolExecutor(max_workers=max(1, jobs)) as ex:
-        list(ex.map(one, todo))
+        list(ex.map(start, todo))
+    stop.set()
+    say(f"corpus: done, {state['ok']} ok, {state['bad']} bad in {(time.time() - started) / 60:.1f}m")
     return len(todo)
 
 

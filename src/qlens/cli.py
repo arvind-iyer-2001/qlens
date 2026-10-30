@@ -8,6 +8,10 @@ from .evaluate import evaluate
 from .graph import analyse, write_outputs
 
 
+def _log(msg: str) -> None:
+    print(msg, file=sys.stderr, flush=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="qlens")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -45,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--backend", choices=["docker", "sandbox-exec"])
     a = ap.parse_args(argv)
     if a.cmd == "build":
-        res = analyse(a.root, execute=a.execute, out_dir=a.out, backend=a.backend, timeout=a.timeout)
+        res = analyse(a.root, execute=a.execute, out_dir=a.out, backend=a.backend, timeout=a.timeout, log=_log)
         write_outputs(res, a.out)
         d = len(res["meta"]["diagnostics"])
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges, {len(res['enrichment_queue'])} queued, {d} diagnostics -> {a.out}")
@@ -86,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges -> {a.out}")
         return 0
     if a.cmd == "measure":
-        res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout)
+        res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout, log=_log)
         dyn = {k: v for k, v in res["meta"]["dynamic"].items() if k != "load_results"}
         print(json.dumps(dict(root=a.root, **dyn)))
         return 0

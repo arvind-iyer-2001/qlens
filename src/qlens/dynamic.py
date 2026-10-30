@@ -72,13 +72,19 @@ def run_file(
 
 
 def run_all(
-    files: list[dict], imports: dict[str, list[str]], namespaces: list[str], base: Path, timeout: float = 30, backend: str | None = None, jobs: int = 4
+    files: list[dict], imports: dict[str, list[str]], namespaces: list[str], base: Path, timeout: float = 30, backend: str | None = None, jobs: int = 4, log=None
 ) -> dict[str, DynFile]:
+    log = log or (lambda m: None)
+    counter = {"n": 0}
     by_rel = {f["rel"]: f for f in files}
 
     def one(f: dict) -> tuple[str, DynFile]:
         deps = [by_rel[d]["path"] for d in dependency_order(f["rel"], imports) if d in by_rel]
-        return f["rel"], run_file(f["path"], deps, namespaces, base, f["repo"], timeout, backend)
+        d = run_file(f["path"], deps, namespaces, base, f["repo"], timeout, backend)
+        counter["n"] += 1
+        what = "loaded ok" if d.loaded else (f"process problem: {d.failure}" if d.failure else f"load stopped: {d.error[:60]}")
+        log(f"  [{counter['n']}/{len(files)}] {f['rel']}: {what}, {len(d.defs)} names defined")
+        return f["rel"], d
 
     with ThreadPoolExecutor(max_workers=max(1, jobs)) as ex:
         return dict(ex.map(one, files))

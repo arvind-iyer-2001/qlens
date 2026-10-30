@@ -84,10 +84,13 @@ def _repo_root(path: Path, root: Path) -> Path:
     return root
 
 
-def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None = None, backend: str | None = None, timeout: float = 60) -> dict:
+def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None = None, backend: str | None = None, timeout: float = 60, log=None) -> dict:
+    log = log or (lambda m: None)
     root = Path(root).resolve()
     base = root if root.is_dir() else root.parent
+    log(f"looking for .q files under {root}")
     disc = discover(root, out_dir)
+    log(f"found {len(disc.files)} q files ({len(disc.skipped)} skipped: too large, empty or not q)")
     g = Graph()
 
     # 1. split
@@ -105,8 +108,10 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
             if s.kind != "q":
                 foreign[s.kind] = foreign.get(s.kind, 0) + 1
     # 2. q parses everything (sandboxed)
+    log(f"split into {len(texts)} statements; asking q to parse them in the sandbox")
     run = run_static({i: t for i, t in texts.items() if t}, base, timeout=timeout, backend=backend)
 
+    log(f"q parsed {sum(1 for r in run.results.values() if r.ok)} statements, {sum(1 for r in run.results.values() if not r.ok)} failed to parse; building graph")
     # 3. definitions, imports, references (needs namespace tracking, per file in order)
     defs_index: dict[str, list[str]] = {}  # qname -> node ids
     pending_refs: list[dict] = []
@@ -174,7 +179,8 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         from .merge import merge
 
         nss = sorted({m.group(0) for q in defs_index if (m := re.match(r"^\.[^.]+(?:\.[^.]+)*(?=\.[^.]+$)", q))})
-        dyn = run_all(files, g.imports, nss, base, timeout=timeout, backend=backend)
+        log(f"loading {len(files)} files in q to confirm (one sandboxed process per file, timeout {timeout:.0f}s each)")
+        dyn = run_all(files, g.imports, nss, base, timeout=timeout, backend=backend, log=log)
         dyn_meta = merge(g, files, dyn, defs_index)
     per_file: dict[str, list[int]] = {}
     for d in g.diagnostics:
@@ -185,6 +191,7 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         for f in files
         if f["rel"] in per_file and len(f["stmts"]) >= 5 and per_file[f["rel"]][0] / len(f["stmts"]) > 0.5
     ]  # most statements unparseable: probably k syntax or not q
+    log(f"graph: {len(g.nodes)} nodes, {len(g.edges)} edges, {len(g.queue)} unresolved references queued")
     return dict(
         nodes=list(g.nodes.values()),
         edges=list(g.edges.values()),
