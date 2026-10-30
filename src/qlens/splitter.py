@@ -10,7 +10,10 @@ Rules (SPEC section 4.2):
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+
+_FOREIGN = re.compile(r"^([A-Za-z])\)")
 
 
 @dataclass(frozen=True)
@@ -18,6 +21,7 @@ class Statement:
     text: str  # comments stripped, continuation lines joined with "\n"
     line: int  # 1-based first line
     end_line: int  # 1-based last line
+    kind: str = "q"  # "q", or "foreign:<c>" for `c)` blocks (p) python, d) docs, k) k code): not q, never parsed
 
 
 def strip_comment(line: str) -> str:
@@ -62,7 +66,11 @@ def split_statements(source: str) -> list[Statement]:
         if cur:
             text = "\n".join(cur).rstrip()
             if text.strip():
-                out.append(Statement(normalise_backslash(text), start, last))
+                m = _FOREIGN.match(text)
+                if m:
+                    out.append(Statement(text, start, last, f"foreign:{m.group(1)}"))
+                else:
+                    out.append(Statement(normalise_backslash(text), start, last))
             cur = []
 
     for no, raw in enumerate(source.splitlines(), start=1):

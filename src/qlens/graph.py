@@ -92,6 +92,7 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
 
     # 1. split
     files: list[dict] = []
+    foreign: dict[str, int] = {}
     texts: dict[int, str] = {}
     meta: dict[int, tuple[int, int]] = {}  # global stmt id -> (file idx, stmt idx)
     for fi, path in enumerate(disc.files):
@@ -100,9 +101,11 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         files.append(dict(path=path, rel=rel, stmts=stmts, repo=_repo_root(path, base)))
         for si, s in enumerate(stmts):
             gid = len(texts)
-            texts[gid], meta[gid] = s.text, (fi, si)
+            texts[gid], meta[gid] = (s.text if s.kind == "q" else ""), (fi, si)
+            if s.kind != "q":
+                foreign[s.kind] = foreign.get(s.kind, 0) + 1
     # 2. q parses everything (sandboxed)
-    run = run_static(texts, base, timeout=timeout, backend=backend)
+    run = run_static({i: t for i, t in texts.items() if t}, base, timeout=timeout, backend=backend)
 
     # 3. definitions, imports, references (needs namespace tracking, per file in order)
     defs_index: dict[str, list[str]] = {}  # qname -> node ids
@@ -119,6 +122,8 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
             res = run.results.get(gid)
             gid += 1
             line = s.line
+            if s.kind != "q":
+                continue
             m = _SYSTEM.match(s.text)
             if m:
                 cmd = _unescape(m.group(1)).strip()
@@ -185,7 +190,7 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
         edges=list(g.edges.values()),
         enrichment_queue=g.queue,
         meta=dict(root=str(base), files=len(files), skipped=[dict(file=str(p), reason=r) for p, r in disc.skipped],
-                  diagnostics=g.diagnostics, qver=run.qver, tier="S+D" if execute else "S", statements=len(texts), dynamic=dyn_meta, suspect_files=suspect),
+                  diagnostics=g.diagnostics, qver=run.qver, tier="S+D" if execute else "S", statements=len(texts) - sum(foreign.values()), foreign_blocks=foreign, dynamic=dyn_meta, suspect_files=suspect),
     )  # fmt: skip
 
 

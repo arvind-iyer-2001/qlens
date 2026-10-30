@@ -1,14 +1,812 @@
 {
+ "AIM-IT4/KDB-Market-Microstructure-Study---Billion-Quote-Analysis": {
+  "commit": "20ced83475c08b610a9bc16453056b42f1d688d4",
+  "dir": "AIM-IT4__KDB-Market-Microstructure-Study---Billion-Quote-Analysis",
+  "q_files": 9,
+  "stars": 0
+ },
+ "AlgoTrader5/cryptoq": {
+  "commit": "fa9313ad28bd4326a588c1caee1f6db3af7aee6d",
+  "dir": "AlgoTrader5__cryptoq",
+  "q_files": 3,
+  "stars": 24
+ },
+ "BonucciAndrea/amber": {
+  "commit": "46fccc2b07139049f2f658a3b590d2104a328344",
+  "dir": "BonucciAndrea__amber",
+  "q_files": 6,
+  "stars": 41
+ },
+ "BuaBook/kdb-common": {
+  "commit": "d836de1eac943aa1fbc8b4c6237ed49e91333206",
+  "dir": "BuaBook__kdb-common",
+  "q_files": 31,
+  "stars": 54
+ },
+ "DEIS-Tools/uppaal-models": {
+  "commit": "34c3adbce940bdd0bbd26e98b0bbf144c9f080ac",
+  "dir": "DEIS-Tools__uppaal-models",
+  "q_files": 8,
+  "stars": 12
+ },
+ "DataIntellectTech/TorQ": {
+  "commit": "4be4fc3457bf1a838e976ff2e9892b2babe8c1c3",
+  "dir": "DataIntellectTech__TorQ",
+  "q_files": 212,
+  "stars": 310
+ },
+ "DataIntellectTech/TorQ-CME": {
+  "commit": "4d5f3484368cc55e16b970b3cb252a1eae38c905",
+  "dir": "DataIntellectTech__TorQ-CME",
+  "q_files": 13,
+  "stars": 16
+ },
+ "DataIntellectTech/TorQ-Crypto": {
+  "commit": "98aaa9f71b1e146db9b7c3f5d4f3ae7ce76694a6",
+  "dir": "DataIntellectTech__TorQ-Crypto",
+  "q_files": 23,
+  "stars": 9
+ },
+ "DataIntellectTech/TorQ-Finance-Starter-Pack": {
+  "commit": "50fcd5ad6d8e50fcd71965010ce38a1fccdad87b",
+  "dir": "DataIntellectTech__TorQ-Finance-Starter-Pack",
+  "q_files": 24,
+  "stars": 70
+ },
+ "DataIntellectTech/kdb-fix-adaptor": {
+  "commit": "11941454f0224d377cb17bd32e8d1a666f63294c",
+  "dir": "DataIntellectTech__kdb-fix-adaptor",
+  "q_files": 2,
+  "stars": 20
+ },
+ "DataIntellectTech/kdbx-modules": {
+  "commit": "489726d0f2027fa8af9efd0baf2c77a809dad728",
+  "dir": "DataIntellectTech__kdbx-modules",
+  "q_files": 131,
+  "stars": 10
+ },
+ "FlyingOE/q_BosonNLP": {
+  "commit": "ace35fad120714c45cb70e20eed693f2db296052",
+  "dir": "FlyingOE__q_BosonNLP",
+  "q_files": 1,
+  "stars": 2
+ },
+ "FlyingOE/q_Wind": {
+  "commit": "b89e2b6e9a56c871dbe0bdce7171eaaf92a92693",
+  "dir": "FlyingOE__q_Wind",
+  "q_files": 8,
+  "stars": 93
+ },
+ "FlyingOE/simplex.q": {
+  "commit": "6f800145f1aa30148dcaca45d51c249f40b19614",
+  "dir": "FlyingOE__simplex.q",
+  "q_files": 5,
+  "stars": 2
+ },
+ "KxSystems/analyst-training": {
+  "commit": "75b12d885a3d1da11cfac0326e4ef920517ca9df",
+  "dir": "KxSystems__analyst-training",
+  "q_files": 5,
+  "stars": 25
+ },
+ "KxSystems/arrowkdb": {
+  "commit": "74658fad9eaac02437d616814345307f2255f75e",
+  "dir": "KxSystems__arrowkdb",
+  "q_files": 12,
+  "stars": 33
+ },
+ "KxSystems/automl": {
+  "commit": "f9e39ec791c67c7308bad0fe3e410a85cfccf0b8",
+  "dir": "KxSystems__automl",
+  "q_files": 83,
+  "stars": 27
+ },
+ "KxSystems/cookbook": {
+  "commit": "7f083085205d784c9eacf0c7a1841d66dbb58531",
+  "dir": "KxSystems__cookbook",
+  "q_files": 21,
+  "stars": 87
+ },
+ "KxSystems/docs": {
+  "commit": "5405b76ba738380f967815fb5552de9590660a92",
+  "dir": "KxSystems__docs",
+  "q_files": 12,
+  "stars": 78
+ },
+ "KxSystems/docs-v1": {
+  "commit": "ee6fcdf8cb59f15257a890297524df892c6aa47c",
+  "dir": "KxSystems__docs-v1",
+  "q_files": 3,
+  "stars": 35
+ },
+ "KxSystems/embedPy": {
+  "commit": "2a77b030e0717f5a26fdbe59b1657046eef5635d",
+  "dir": "KxSystems__embedPy",
+  "q_files": 5,
+  "stars": 96
+ },
+ "KxSystems/embedR": {
+  "commit": "82a06e08d227270a4eb36ae6b45ab20388163c1d",
+  "dir": "KxSystems__embedR",
+  "q_files": 2,
+  "stars": 13
+ },
+ "KxSystems/ffi": {
+  "commit": "cf9c6425a593aecbcb625cd8fcf3026ba1585567",
+  "dir": "KxSystems__ffi",
+  "q_files": 5,
+  "stars": 33
+ },
+ "KxSystems/hdf5": {
+  "commit": "aa71ae464791a7547c351046babef6c99ebc0574",
+  "dir": "KxSystems__hdf5",
+  "q_files": 10,
+  "stars": 14
+ },
+ "KxSystems/jupyterq": {
+  "commit": "1cc895e674be17d8a9992c0bb128508120a34825",
+  "dir": "KxSystems__jupyterq",
+  "q_files": 13,
+  "stars": 114
+ },
+ "KxSystems/kafka": {
+  "commit": "af007a32b5c0a41bcf3113fcaaf2f9fbde566227",
+  "dir": "KxSystems__kafka",
+  "q_files": 8,
+  "stars": 55
+ },
  "KxSystems/kdb": {
   "commit": "1daebf73349199b1318649fc2c5656cab2b4a7f2",
   "dir": "KxSystems__kdb",
   "q_files": 46,
   "stars": 474
  },
+ "KxSystems/kdb-architecture-course": {
+  "commit": "48d6785fcaa2c00322b8d1214dbd0e2ab2b6636d",
+  "dir": "KxSystems__kdb-architecture-course",
+  "q_files": 9,
+  "stars": 13
+ },
+ "KxSystems/kdb-taq": {
+  "commit": "bd1b1c68e53694810cb3bfb1df3f5b70ca20613e",
+  "dir": "KxSystems__kdb-taq",
+  "q_files": 1,
+  "stars": 17
+ },
+ "KxSystems/kdb-tick": {
+  "commit": "85c08ff192b0a103b323246c7300a37919be6159",
+  "dir": "KxSystems__kdb-tick",
+  "q_files": 3,
+  "stars": 107
+ },
+ "KxSystems/kxkdb": {
+  "commit": "4884f43aae560475315a6e44ba108965452a2c11",
+  "dir": "KxSystems__kxkdb",
+  "q_files": 2,
+  "stars": 12
+ },
+ "KxSystems/man": {
+  "commit": "27c67adc03bcc93fe4c735db71538b0f200a1322",
+  "dir": "KxSystems__man",
+  "q_files": 2,
+  "stars": 8
+ },
+ "KxSystems/ml": {
+  "commit": "5509fa6cfc454c68bf3441672fe1a26cb5a19088",
+  "dir": "KxSystems__ml",
+  "q_files": 177,
+  "stars": 66
+ },
+ "KxSystems/mlnotebooks": {
+  "commit": "f8abb60b36941d8c74f3acba89737d11b100a1ac",
+  "dir": "KxSystems__mlnotebooks",
+  "q_files": 2,
+  "stars": 65
+ },
+ "KxSystems/mqtt": {
+  "commit": "4d98447fcfd062fdd0040741d8778292dc1025ff",
+  "dir": "KxSystems__mqtt",
+  "q_files": 3,
+  "stars": 12
+ },
+ "KxSystems/nano": {
+  "commit": "66de0246e96cf2cbad61779da2ec972075f170f0",
+  "dir": "KxSystems__nano",
+  "q_files": 16,
+  "stars": 17
+ },
+ "KxSystems/nlp": {
+  "commit": "9a7f2d3f8daa88a8e8de7b25c7ffc6d7c25447da",
+  "dir": "KxSystems__nlp",
+  "q_files": 9,
+  "stars": 18
+ },
+ "KxSystems/prometheus-kdb-exporter": {
+  "commit": "ca30eedc45ba744ed8dc609d29449318d0ac2e55",
+  "dir": "KxSystems__prometheus-kdb-exporter",
+  "q_files": 3,
+  "stars": 20
+ },
+ "KxSystems/protobufkdb": {
+  "commit": "0b7ca2bf993976cf71c32105a977d44c28f899e4",
+  "dir": "KxSystems__protobufkdb",
+  "q_files": 14,
+  "stars": 14
+ },
+ "KxSystems/pykx": {
+  "commit": "321319e814dca591a29fcf3f0efd270a9f6e116d",
+  "dir": "KxSystems__pykx",
+  "q_files": 38,
+  "stars": 80
+ },
+ "KxSystems/pyq": {
+  "commit": "1afc8641809c5bbbc0f78d260b9fbca14e75b504",
+  "dir": "KxSystems__pyq",
+  "q_files": 3,
+  "stars": 203
+ },
+ "KxSystems/solace": {
+  "commit": "7000350379d99fb0321e2b02862c3e73de3833c8",
+  "dir": "KxSystems__solace",
+  "q_files": 13,
+  "stars": 12
+ },
+ "LeslieGoldsmith/dpy": {
+  "commit": "5242d4ecfbde6664f525556147fbc1bf83a4d3dd",
+  "dir": "LeslieGoldsmith__dpy",
+  "q_files": 1,
+  "stars": 26
+ },
+ "LeslieGoldsmith/ed": {
+  "commit": "4766607b08ee3f2c66dfb40a285461e20c9c58ef",
+  "dir": "LeslieGoldsmith__ed",
+  "q_files": 1,
+  "stars": 12
+ },
+ "LeslieGoldsmith/qprof": {
+  "commit": "4d48be20f093337f0d88f842a0b1565b8abbb95c",
+  "dir": "LeslieGoldsmith__qprof",
+  "q_files": 1,
+  "stars": 41
+ },
+ "LeslieGoldsmith/ws": {
+  "commit": "db65871bea149f15b49f8bbadfa853809676c52b",
+  "dir": "LeslieGoldsmith__ws",
+  "q_files": 1,
+  "stars": 33
+ },
+ "a2ndrade/q-intellij-plugin": {
+  "commit": "78e4c91e6fcfa01f73aeaf5fcf91beadb967b8ea",
+  "dir": "a2ndrade__q-intellij-plugin",
+  "q_files": 14,
+  "stars": 22
+ },
+ "aa1024/datetimeQ": {
+  "commit": "cd317fa644e3e4c6761e7466e0d5bc9face2f539",
+  "dir": "aa1024__datetimeQ",
+  "q_files": 3,
+  "stars": 8
+ },
+ "aa1024/learnQ": {
+  "commit": "aa108f1eef01695cac98af4c9b37711078425d16",
+  "dir": "aa1024__learnQ",
+  "q_files": 8,
+  "stars": 11
+ },
+ "aa1024/sphinxQ": {
+  "commit": "f654a3eb464265d622a5ca0b5339eaa3cefaa4d1",
+  "dir": "aa1024__sphinxQ",
+  "q_files": 8,
+  "stars": 7
+ },
+ "aa1024/strQ": {
+  "commit": "7fa050ffaf385477bc16e946c6ec8ca7955833d7",
+  "dir": "aa1024__strQ",
+  "q_files": 3,
+  "stars": 10
+ },
+ "adavies42/qist": {
+  "commit": "580e7f17d56c6509dbdc77d4717a1e28dbd7129f",
+  "dir": "adavies42__qist",
+  "q_files": 36,
+  "stars": 20
+ },
+ "adotsch/aoc": {
+  "commit": "5c7eb11354508c49ca3f26212714a0437f20e8f7",
+  "dir": "adotsch__aoc",
+  "q_files": 183,
+  "stars": 17
+ },
+ "agoodquant/qr": {
+  "commit": "d85fe72cdf6475e168b3221adb9b883dff9d6737",
+  "dir": "agoodquant__qr",
+  "q_files": 31,
+  "stars": 7
+ },
+ "ajhxia/UNI": {
+  "commit": "4c731b5d973f179fa0e427e9a17450032e17faf2",
+  "dir": "ajhxia__UNI",
+  "q_files": 2,
+  "stars": 9
+ },
+ "anton-dovzhenko/advent-of-code": {
+  "commit": "0164f2df824573a6207639843e0bb21ec95cd0b3",
+  "dir": "anton-dovzhenko__advent-of-code",
+  "q_files": 17,
+  "stars": 12
+ },
+ "asatirahul/cryptoq": {
+  "commit": "ffc72c1cdc487595df82de5a7969100bf0c4ade7",
+  "dir": "asatirahul__cryptoq",
+  "q_files": 4,
+  "stars": 21
+ },
+ "awilson-kx/nlp": {
+  "commit": "e39c8151a6b2ba6cfded79cd0e6345722f73de21",
+  "dir": "awilson-kx__nlp",
+  "q_files": 9,
+  "stars": 8
+ },
+ "better-4/Better4": {
+  "commit": "356f94fca250457b741fc01ea64d9fd024a18b7c",
+  "dir": "better-4__Better4",
+  "q_files": 1,
+  "stars": 20
+ },
+ "bradleyboyuyang/FTEC5530-Algo-Trading": {
+  "commit": "1bde18d0bcaea1fe74ac3567d3dcc66bc1909744",
+  "dir": "bradleyboyuyang__FTEC5530-Algo-Trading",
+  "q_files": 8,
+  "stars": 23
+ },
+ "breuleux/quaint": {
+  "commit": "6bf8b7027c96f67d34e565ca9f331449e4674e73",
+  "dir": "breuleux__quaint",
+  "q_files": 1,
+  "stars": 32
+ },
+ "caezium/kdb-q-challenges": {
+  "commit": "875ad719a1df9c554fd90e16831b04c461e823b1",
+  "dir": "caezium__kdb-q-challenges",
+  "q_files": 14,
+  "stars": 3
+ },
+ "chuchunf/qex": {
+  "commit": "57a10558453285c286fa68d76afdce461e8e7013",
+  "dir": "chuchunf__qex",
+  "q_files": 8,
+  "stars": 11
+ },
+ "corememltd/qmaxmind": {
+  "commit": "720343be66816d69978a1b86ee7d24244c6848dc",
+  "dir": "corememltd__qmaxmind",
+  "q_files": 1,
+  "stars": 0
+ },
+ "crollila/kdb-monte-carlo-option-pricer": {
+  "commit": "8c798e92e93a0f8305726605966fc3b1674b9569",
+  "dir": "crollila__kdb-monte-carlo-option-pricer",
+  "q_files": 7,
+  "stars": 0
+ },
+ "danielkrizian/qinfo": {
+  "commit": "2be11c43114a84681dc8a1c7028632b4d4813376",
+  "dir": "danielkrizian__qinfo",
+  "q_files": 2,
+  "stars": 3
+ },
+ "danielkrizian/qlearn": {
+  "commit": "e12bfeb3d4302ce80aa94f81fdeee68c9d3acc56",
+  "dir": "danielkrizian__qlearn",
+  "q_files": 3,
+  "stars": 10
+ },
+ "derekwisong/qextension": {
+  "commit": "058173cd8b70e03788ff635548af1e08ce25788d",
+  "dir": "derekwisong__qextension",
+  "q_files": 1,
+  "stars": 0
+ },
+ "drzwz/qbitmex": {
+  "commit": "9d0d362bba1ce246dc4a1bd0f7166622254cecdf",
+  "dir": "drzwz__qbitmex",
+  "q_files": 1,
+  "stars": 9
+ },
+ "enlnt/Q.jl": {
+  "commit": "bd9ce8d1c93fceb4e66649b212bd92c719a44086",
+  "dir": "enlnt__Q.jl",
+  "q_files": 2,
+  "stars": 7
+ },
+ "enlnt/kdb-magic": {
+  "commit": "3bb7df78f818f42e4576c4704b294cc1d7436c83",
+  "dir": "enlnt__kdb-magic",
+  "q_files": 1,
+  "stars": 12
+ },
+ "finos/kdb": {
+  "commit": "e54032a57fd4d9c1288ef4807f2c9f7c22d1c290",
+  "dir": "finos__kdb",
+  "q_files": 37,
+  "stars": 54
+ },
+ "foorenxiang/OHR400Dashboard": {
+  "commit": "accd324c8ed2028d6645cf8f1424976bfc69f75c",
+  "dir": "foorenxiang__OHR400Dashboard",
+  "q_files": 16,
+  "stars": 6
+ },
+ "geocar/q-mode": {
+  "commit": "adb52c3cf615b9d3880121cf263fbaa8fa16da8d",
+  "dir": "geocar__q-mode",
+  "q_files": 1,
+  "stars": 12
+ },
+ "gyorokpeter/puzzle_solutions": {
+  "commit": "55e7103fc319e4c2a852a5e64a41b15d33260715",
+  "dir": "gyorokpeter__puzzle_solutions",
+  "q_files": 213,
+  "stars": 7
+ },
+ "hanssmail/quantQ": {
+  "commit": "8139d103356c8d2419c020e61c002a28c564bbf4",
+  "dir": "hanssmail__quantQ",
+  "q_files": 52,
+  "stars": 101
+ },
+ "hrj8055/kdb-trade-surveillance": {
+  "commit": "045ff12be6c25c396ce53c722a84d27ee41f85f7",
+  "dir": "hrj8055__kdb-trade-surveillance",
+  "q_files": 5,
+  "stars": 0
+ },
+ "hughhyndman/kdbspark": {
+  "commit": "2ad5e28001412cf64081e7ba36b53ebe43913238",
+  "dir": "hughhyndman__kdbspark",
+  "q_files": 3,
+  "stars": 21
+ },
+ "hughhyndman/pgtokdb": {
+  "commit": "5e79929cbc13fcb69cdb36d90ce2af0723687ab5",
+  "dir": "hughhyndman__pgtokdb",
+  "q_files": 2,
+  "stars": 18
+ },
+ "jasraj/q-doc": {
+  "commit": "70dec703d559349d0e1b69f2bc8ab08b00f5fd50",
+  "dir": "jasraj__q-doc",
+  "q_files": 4,
+  "stars": 18
+ },
+ "jbrussell/MATnoise": {
+  "commit": "d998bbe5e5a006bcef313ff7a1dbdad422db0816",
+  "dir": "jbrussell__MATnoise",
+  "q_files": 2,
+  "stars": 41
+ },
+ "jlas/ml.q": {
+  "commit": "bb0c8ca39717023de951351127342ad96dbb0f26",
+  "dir": "jlas__ml.q",
+  "q_files": 9,
+  "stars": 31
+ },
+ "jonathonmcmurray/kdbslack": {
+  "commit": "eb9d844625e7a169c34e527d732bedb67538744c",
+  "dir": "jonathonmcmurray__kdbslack",
+  "q_files": 49,
+  "stars": 13
+ },
+ "jonathonmcmurray/qwebapi": {
+  "commit": "25c802119b55ca4f3d18703fdf3c5d124781818b",
+  "dir": "jonathonmcmurray__qwebapi",
+  "q_files": 2,
+  "stars": 12
+ },
+ "jonathonmcmurray/reQ": {
+  "commit": "6728dd50ed767ffb8818940a51579d4abc8c01d9",
+  "dir": "jonathonmcmurray__reQ",
+  "q_files": 16,
+  "stars": 39
+ },
+ "jonathonmcmurray/ws.q": {
+  "commit": "639d1ae5c0a2c1cc0b6f731f291d7b95024f644e",
+  "dir": "jonathonmcmurray__ws.q",
+  "q_files": 5,
+  "stars": 33
+ },
+ "kdbcn/kdb": {
+  "commit": "b6b47863202423cfd0b2c678d9a467c8a81ba817",
+  "dir": "kdbcn__kdb",
+  "q_files": 12,
+  "stars": 12
+ },
+ "kdbinsidebrains/plugin": {
+  "commit": "6c7582bd3294b07ba23c9de347a9812a9973b357",
+  "dir": "kdbinsidebrains__plugin",
+  "q_files": 1,
+  "stars": 14
+ },
+ "kimtang/btick": {
+  "commit": "25ad00b2b14bc666924a9b3b65e13a9292cb05d4",
+  "dir": "kimtang__btick",
+  "q_files": 62,
+  "stars": 8
+ },
+ "krish240574/ETFMachineLearning": {
+  "commit": "e1fb9cbaa25f9edb212c6e2f701dab1d3cfb462f",
+  "dir": "krish240574__ETFMachineLearning",
+  "q_files": 1,
+  "stars": 40
+ },
+ "krish240574/embedPyMLAI": {
+  "commit": "d2c9baa915b5499eb1d74ef9f6ea95eb80bde05b",
+  "dir": "krish240574__embedPyMLAI",
+  "q_files": 19,
+  "stars": 6
+ },
+ "krish240574/lstmq": {
+  "commit": "640ab3d2798c2934d5a4c11cf88cb2f29d913310",
+  "dir": "krish240574__lstmq",
+  "q_files": 3,
+  "stars": 7
+ },
+ "kxcontrib/space-weather": {
+  "commit": "614a5d85daf799ceb4ef6b605db9a84b263bfacf",
+  "dir": "kxcontrib__space-weather",
+  "q_files": 8,
+  "stars": 6
+ },
+ "kysely/kdbq-server": {
+  "commit": "900615b1baa65ac5e14175902416518c417d9395",
+  "dir": "kysely__kdbq-server",
+  "q_files": 1,
+  "stars": 3
+ },
+ "lmartinking/qrapidjson": {
+  "commit": "4764b6d051032435e5829b13c7d017bb50c51a5e",
+  "dir": "lmartinking__qrapidjson",
+  "q_files": 1,
+  "stars": 10
+ },
+ "manifoldfinance/qBigInt": {
+  "commit": "f7fd3f9b525214f3f41e835b83efb5e98b2aa3ea",
+  "dir": "manifoldfinance__qBigInt",
+  "q_files": 1,
+  "stars": 7
+ },
+ "matthieu-briche/kdb-execution-quality-tca": {
+  "commit": "8f51c815bde313ac1c9a22db49aab0a995e6ce7b",
+  "dir": "matthieu-briche__kdb-execution-quality-tca",
+  "q_files": 5,
+  "stars": 0
+ },
+ "matthieu-briche/kdb-realtime-tick-dashboard": {
+  "commit": "551085565c04371177043bd1d18f8e0c0ed7acf5",
+  "dir": "matthieu-briche__kdb-realtime-tick-dashboard",
+  "q_files": 8,
+  "stars": 0
+ },
+ "mi156321/cpp-feed-handler": {
+  "commit": "4e0989da93d89b3c2a453a50d1aa1c5223dbb58f",
+  "dir": "mi156321__cpp-feed-handler",
+  "q_files": 1,
+  "stars": 0
+ },
+ "mi156321/q-book-snapshot": {
+  "commit": "d47f8715d33e7289a1d3d1d676eaf7de98524a96",
+  "dir": "mi156321__q-book-snapshot",
+  "q_files": 1,
+  "stars": 0
+ },
+ "mkeenan-kdb/snpDive": {
+  "commit": "3d84de2b4225d7458255b0f7402b9ce4895bf8b7",
+  "dir": "mkeenan-kdb__snpDive",
+  "q_files": 2,
+  "stars": 17
+ },
+ "mkst/aoc": {
+  "commit": "82d9fd87fd4604ba919d2140bd00805eeaf350ea",
+  "dir": "mkst__aoc",
+  "q_files": 155,
+  "stars": 14
+ },
+ "mortensorensen/QInteractiveBrokers": {
+  "commit": "b94b13435edbf77d1bc7e38842c405229c2672c7",
+  "dir": "mortensorensen__QInteractiveBrokers",
+  "q_files": 2,
+  "stars": 16
+ },
+ "nalvid/aoc": {
+  "commit": "e2fbd59119ad7372a79ddd04e6d10033f5c68f1d",
+  "dir": "nalvid__aoc",
+  "q_files": 1,
+  "stars": 3
+ },
+ "nandanito/array-thinking-to-q": {
+  "commit": "fbb7537daa3fe28d7a6865fd30ce07056de9425d",
+  "dir": "nandanito__array-thinking-to-q",
+  "q_files": 53,
+  "stars": 1
+ },
+ "nicholasferguson/kdb.q.kalman.filter.beta.ETFs": {
+  "commit": "f2d4b3ea4d5a48feb2aa1b51cbec59144a7a9244",
+  "dir": "nicholasferguson__kdb.q.kalman.filter.beta.ETFs",
+  "q_files": 1,
+  "stars": 11
+ },
+ "nugend/qspec": {
+  "commit": "9b846b68a8d808e472ba504d18c325b14b468087",
+  "dir": "nugend__qspec",
+  "q_files": 14,
+  "stars": 34
+ },
+ "nyierr/adventofcode": {
+  "commit": "84a73ba67b621345a98b3bb936d8511f6f4128fa",
+  "dir": "nyierr__adventofcode",
+  "q_files": 15,
+  "stars": 3
+ },
+ "nyierr/q-99": {
+  "commit": "f67af9f9cd5385b48f7093c0d091725590a6e143",
+  "dir": "nyierr__q-99",
+  "q_files": 1,
+  "stars": 0
+ },
+ "patmok/unparse": {
+  "commit": "079b8a2ad1a18770677bd68ef31b5fa1d38c3864",
+  "dir": "patmok__unparse",
+  "q_files": 1,
+  "stars": 17
+ },
+ "peachq-org/peachq": {
+  "commit": "0e20de1737231b44252a5f2a7c70d56a93aded68",
+  "dir": "peachq-org__peachq",
+  "q_files": 30,
+  "stars": 66
+ },
+ "picoDoc/betfair-data-capture": {
+  "commit": "479ac40df7543e30700005210749895c3ce7d268",
+  "dir": "picoDoc__betfair-data-capture",
+  "q_files": 18,
+  "stars": 19
+ },
+ "poetiq/poetiq": {
+  "commit": "57900f400de450a266fd6ff56e1fca238efe9a10",
+  "dir": "poetiq__poetiq",
+  "q_files": 16,
+  "stars": 37
+ },
+ "psaris/funq": {
+  "commit": "9c95cc27bbdcd977fa0fe498efb0a331e4a5b581",
+  "dir": "psaris__funq",
+  "q_files": 73,
+  "stars": 143
+ },
+ "psaris/mm": {
+  "commit": "43e45c1ab87a9f7277bdc0c772206206163d421b",
+  "dir": "psaris__mm",
+  "q_files": 2,
+  "stars": 6
+ },
+ "psaris/q4q": {
+  "commit": "260337e58cb803c6efc9d397c69d5d5ac5167327",
+  "dir": "psaris__q4q",
+  "q_files": 3,
+  "stars": 34
+ },
+ "psaris/qtips": {
+  "commit": "b8e0a684ae6abc87d1973cbb595a629a02c708ce",
+  "dir": "psaris__qtips",
+  "q_files": 13,
+  "stars": 156
+ },
+ "qbists/studyq": {
+  "commit": "efe1da1a9c31044580c573f59e9f669d5a646e67",
+  "dir": "qbists__studyq",
+  "q_files": 36,
+  "stars": 136
+ },
+ "quintanar401/q2c": {
+  "commit": "8d95724f5387b50a82674b660bbf4750f4a11a26",
+  "dir": "quintanar401__q2c",
+  "q_files": 20,
+  "stars": 25
+ },
+ "quintanar401/qll": {
+  "commit": "c3328160f55800a29d418006a8aadb129ab952d2",
+  "dir": "quintanar401__qll",
+  "q_files": 1,
+  "stars": 9
+ },
+ "redsift/rkdb": {
+  "commit": "7125f3d9cf44b8202c541ab5f63404f4888456ac",
+  "dir": "redsift__rkdb",
+  "q_files": 1,
+  "stars": 17
+ },
+ "robmoore-i/JsonRestApi": {
+  "commit": "25d98a26bf79f1ffd379ccc41338212f9b37d135",
+  "dir": "robmoore-i__JsonRestApi",
+  "q_files": 3,
+  "stars": 10
+ },
  "sambacha/q-evm": {
   "commit": "c6d460069a7f9c7a3b452fa77e5654725943238a",
   "dir": "sambacha__q-evm",
   "q_files": 8,
   "stars": 419
+ },
+ "samkennerly/q_practice": {
+  "commit": "63045b80b71a766b4ed1273094437e59d3d51ff0",
+  "dir": "samkennerly__q_practice",
+  "q_files": 5,
+  "stars": 11
+ },
+ "sandybradley/qMachineTrader": {
+  "commit": "121810c984022c51b977f2a4d4ec87a3ac4ac8dd",
+  "dir": "sandybradley__qMachineTrader",
+  "q_files": 5,
+  "stars": 20
+ },
+ "sandybradley/qMonitor": {
+  "commit": "9351aab0f334e42dd546e8ea0ffa51834e1122a8",
+  "dir": "sandybradley__qMonitor",
+  "q_files": 21,
+  "stars": 12
+ },
+ "sandybradley/qSignals": {
+  "commit": "4331a21db511d2d397d5a1ba163ed31f8663f4f8",
+  "dir": "sandybradley__qSignals",
+  "q_files": 4,
+  "stars": 10
+ },
+ "secti6n/kPARC": {
+  "commit": "0939280ee06fdccc26d15fd17ff3d8578b6051f3",
+  "dir": "secti6n__kPARC",
+  "q_files": 3,
+  "stars": 6
+ },
+ "simongarland/csvguess": {
+  "commit": "8636826545c968f301a5eac4abd040d842624689",
+  "dir": "simongarland__csvguess",
+  "q_files": 2,
+  "stars": 13
+ },
+ "simongarland/tick": {
+  "commit": "d5fdc3d3112ecdf547c42f4a6f2f917cb3bffa50",
+  "dir": "simongarland__tick",
+  "q_files": 5,
+  "stars": 15
+ },
+ "skeptiqos/qsl": {
+  "commit": "e977eec679b38cef26ab0a66bc6b56734b19f736",
+  "dir": "skeptiqos__qsl",
+  "q_files": 10,
+  "stars": 7
+ },
+ "t-martin/qmail": {
+  "commit": "72a5132b84cb16c7520f4eb018dcbd11476d4284",
+  "dir": "t-martin__qmail",
+  "q_files": 2,
+  "stars": 13
+ },
+ "t-martin/qmulti": {
+  "commit": "28cf974636ee99f9920cef2fdd050d3c101137d0",
+  "dir": "t-martin__qmulti",
+  "q_files": 1,
+  "stars": 9
+ },
+ "t-martin/qremote": {
+  "commit": "902719a5c40c183e6071fbd558f8c2c4ee3e3ba4",
+  "dir": "t-martin__qremote",
+  "q_files": 3,
+  "stars": 8
+ },
+ "zakoud/qfix": {
+  "commit": "59910cb8a78ee78a48a5a7ace92452a737baf0db",
+  "dir": "zakoud__qfix",
+  "q_files": 1,
+  "stars": 3
  }
 }

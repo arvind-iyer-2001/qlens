@@ -64,3 +64,9 @@ def test_crlf():
 def test_shebang_line_skipped():
     assert texts("#!/usr/bin/env q\na:1\n") == [("a:1", 2, 2)]
     assert texts("a:1\n#!notshebang\n") == [("a:1", 1, 1), ("#!notshebang", 2, 2)]
+
+
+def test_foreign_blocks_marked():
+    src = "a:1\nd) doc\n more doc\np)import os\nb:2\n"
+    st = split_statements(src)
+    assert [(s.kind, s.line) for s in st] == [("q", 1), ("foreign:d", 2), ("foreign:p", 4), ("q", 5)]
