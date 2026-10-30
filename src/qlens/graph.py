@@ -162,6 +162,11 @@ def analyse(root: str | Path, execute: bool = False, out_dir: str | Path | None 
             owner_ids = owners or [f["id"]]
             lam_nodes = []
             roles, nested = classify(tree, free)
+            for dn in {d.name for d in sdefs}:  # the definition itself writes its own name: not a reference
+                if dn in roles:
+                    roles[dn].discard("writes")
+                    if not roles[dn]:
+                        del roles[dn]
             _collect(f, ns, owner_ids, roles, line, pending_refs, "S")
             for lam in nested:
                 _lam(f, ns, owner_ids, lam, line, pending_refs)

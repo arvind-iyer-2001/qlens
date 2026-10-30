@@ -50,3 +50,13 @@ precision 0.7949 (agree 9737, refuted 2513), recall 0.8896 (missed 1208), per-re
 The nested-lambda fix helped (3056 -> 2513 refuted) but is not the main cause, and "missed" rose from 7 to 1208
 because the live side now includes nested names. Still far below the 98.5% target; cause unknown until examples
 are inspected (`qlens measure REPO --examples FILE`).
+
+### Cause analysis of dev runs 1-2 (from `measure --examples` on puzzle_solutions and quantQ)
+
+- Refuted: every example was a spurious self-edge. A top-level definition `.ns.f:{...}` writes the global `.ns.f`; the
+  wrapper-lambda free-name list reports that write and it was recorded as `f` writes `f`. q correctly lists no such
+  reference, so each was marked refuted. Fixed: a definition's own assignment target is not a reference.
+- Missed: names such as `ltrim`, `rtrim`, `.Q.v`, `.Q.pf` came from q's own keyword implementations (k lambdas such as
+  `trim`) that appear as constants of user functions; the live side recursed into them. Fixed: only lambdas that are not
+  `k)` lambdas are followed.
+- Runs 1-2 numbers above are therefore partly measurement error and are superseded; run 3 is needed.

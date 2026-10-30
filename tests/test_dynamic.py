@@ -79,3 +79,16 @@ def test_nested_lambdas_are_not_refuted(tmp_path):
     r = analyse(tmp_path, execute=True)
     d = r["meta"]["dynamic"]
     assert d["refuted"] == 0 and d["agree"] >= 2 and d["missed"] == 0
+
+
+@needs_q
+def test_dotted_definition_has_no_self_edge_and_q_keywords_are_not_missed(tmp_path):
+    (tmp_path / "a.q").write_text(
+        ".ns.helper:{x+1}\n.ns.run:{trim string .ns.helper x}\n.ns.cols2:{.Q.v x}\n"
+    )
+    r = analyse(tmp_path, execute=True)
+    lab = {n["id"]: n["label"] for n in r["nodes"]}
+    selfs = [e for e in r["edges"] if e["source"] == e["target"]]
+    assert selfs == []
+    d = r["meta"]["dynamic"]
+    assert d["refuted"] == 0 and d["missed"] == 0, d["examples"]

@@ -24,7 +24,10 @@
  r:@[value;v;()];
  if[not (0h=type r)&4<=count r; :()];
  own:(1_r 3) except `;
- inner:raze .z.s each (4_ -1_ r) where 100h=type each 4_ -1_ r;
+ cs:4_ -1_ r;
+ / only lambdas written in the user's code: q's own keywords (trim, xkey, ...) are k lambdas ("k){...}") with their own free names
+ cs:cs where {$[100h=type x;not (string x) like "k)*";0b]} each cs;
+ inner:raze .z.s each cs;
  distinct own,inner}
 
 .dy.info:{[q]
