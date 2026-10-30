@@ -41,3 +41,12 @@ Cause found by analysis: the live comparison used the outer function's `value` f
 only inside nested lambdas, so edges from nested lambdas were marked refuted. This is a measurement bug, fixed
 in the commit after f7e6ba0 (static and live sides both use outer + nested free names). Run 2 is needed to see
 what remains. Other refuted sources are not yet known.
+
+## Dev run 2 (out/dev2.jsonl, 116 dev repos, code at 60b663d)
+
+precision 0.7949 (agree 9737, refuted 2513), recall 0.8896 (missed 1208), per-repo precision median 0.957, p10 0.595.
+65 of 116 repos had zero refuted edges. 948 files loaded, 1122 failed, 48 process failures. Indirect edges: 927 agree,
+15 refuted. Defs: 10373 confirmed live, 196 refuted, 2291 defined at runtime that static missed.
+The nested-lambda fix helped (3056 -> 2513 refuted) but is not the main cause, and "missed" rose from 7 to 1208
+because the live side now includes nested names. Still far below the 98.5% target; cause unknown until examples
+are inspected (`qlens measure REPO --examples FILE`).
