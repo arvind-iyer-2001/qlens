@@ -230,8 +230,7 @@ def _resolve(g: Graph, r: dict, defs_index, builtins, files):
         g.edge(r["owner"], nid, rel, "S-unresolved", f"{q} not defined anywhere", r["file"], r["line"], raw=r["name"])
         g.queue.append(dict(**{"from": r["owner"]}, name=q, reason="unresolved reference", file=r["file"], line=r["line"]))
         return
-    same_file = [c for c in cands if g.nodes[c]["file"] == r["file"]]
-    chosen = same_file or cands
+    chosen = _prefer(g, cands, r, files)
     if len(chosen) > 1:
         tier, ev = "S-indirect", f"{q} has {len(chosen)} definitions; edge to each"
     else:
@@ -245,6 +244,30 @@ def _resolve(g: Graph, r: dict, defs_index, builtins, files):
         if r["role"] == USES and node["kind"] == "variable":
             node["kind"] = "table"
         g.edge(r["owner"], c, rel, t, e, r["file"], r["line"], raw=r["name"])
+
+
+def _closure(imports: dict[str, list[str]], rel: str) -> set[str]:
+    seen, stack = set(), [rel]
+    while stack:
+        for d in imports.get(stack.pop(), []):
+            if d not in seen:
+                seen.add(d)
+                stack.append(d)
+    return seen
+
+
+def _prefer(g: Graph, cands: list[str], r: dict, files: list[dict]) -> list[str]:
+    """Pick which definitions a reference binds to: same file, then loaded files, then same repo, then all."""
+    by_file = lambda ids, fs: [c for c in ids if g.nodes[c]["file"] in fs]  # noqa: E731
+    same = by_file(cands, {r["file"]})
+    if same:
+        return same
+    loaded = by_file(cands, _closure(g.imports, r["file"]))
+    if loaded:
+        return loaded
+    repo_files = {f["rel"] for f in files if f["repo"] == r["repo"]}
+    in_repo = by_file(cands, repo_files)
+    return in_repo or cands
 
 
 def write_outputs(result: dict, out: str | Path) -> None:
