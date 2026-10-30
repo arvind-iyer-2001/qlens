@@ -1,38 +1,40 @@
 # Handoff — 2026-10-30
 
 ## State
-qlens: greenfield q/kdb+ knowledge-graph tool; q itself is the parser (SPEC.md is source of truth). Only M0 (spike) is done: no code, no tests. Findings are in `docs/Q_FACTS.md`.
+qlens extracts a q/kdb+ knowledge graph deterministically (no LLM, no tree-sitter): q's own `parse`/`value` is the parser, every node/edge has tier + confidence + evidence. Works: discovery, splitter, sandboxed static pass, graph builder, trap corpus (exact), dynamic `--execute` pass (D2/D3/refuted), graphify-shaped export, corpus tooling, 43 tests green. Purpose: graphify has no tree-sitter grammar for q, so qlens supplies the AST-step equivalent for `.q` files; graphify would call `qlens export` for q files and merge by node id.
 
 ## Done this session
-- M0 spike: verified parse/value behaviour for `\d`, `\l`, `system`, dotted assignment, adverbs, qsql, nested lambdas, crash probes (`43d8dca`, `4c792d8`).
-- Chose tagged-tree JSON wire format (prototype only, in scratchpad).
+- M0 spike (`docs/Q_FACTS.md`), M1 splitter/discovery, M2 static pass + graph + trap corpus, M3 calibration/report, M4 dynamic pass + tests, graphify export (`src/qlens/export.py`), multi-repo resolution fix (M7), README (M5 instructions), M6 tooling (`scripts/fetch_corpus.py`, `qlens corpus|summary|calibrate`).
+- Real-repo trial (static only): KxSystems/kdb parses with 1 diagnostic; sambacha/q-evm has k-syntax files (honest diagnostics).
 
 ## In progress
-- Waiting on Arvind: go-ahead for M1 plus answers to the q-version and unary-minus questions below.
+- Background fetch of up to 250 public q repos into `corpora/` (gitignored; `corpora/MANIFEST.json` lists them). Next: static-build all, error-analyse by cause, fix generally, record in `docs/RESULTS.md`.
 
 ## Open tasks
 | # | Task | Priority | Area |
 |---|------|----------|------|
-| 1 | Decide: q 4.x binary available? Or `-name` -> `neg name` fallback at lower confidence | High | M1/M2 |
-| 2 | M1: splitter, discovery, content check, tests | High | M1 |
-| 3 | M2: sandboxed static pass, graph builder, trap corpus | High | M2 |
-| 4 | Re-run unmeasured probes: 100k-deep parens, 2000-nested braces | Low | M0 |
-| 5 | M3-M8 per SPEC section 9 | Normal | later |
+| 1 | Arvind: decide on q 4.x binary vs `-x` limitation (q5 parser rejects `-name`, keyword assignment) | High | q version |
+| 2 | Static-build full corpus; error-analyse; commit MANIFEST.json | High | M6 |
+| 3 | Arvind launches `--execute` corpus runs: `qlens corpus corpora --split dev --jobs 4 --timeout 600 --out out/dev1.jsonl`; then `qlens summary`, `qlens calibrate`; test split ONCE at the end | High | M6 |
+| 4 | Real run on the Linux server with docker (README steps) | High | M5 |
+| 5 | Wire `qlens export` into graphify (graphify-side change, Arvind's repo) | Normal | integration |
+| 6 | M8: LLM step for enrichment_queue as INFERRED edges, stub env failures, `.z.m` modules | Later | M8 |
 
 ## Constraints & assumptions
-- Fully greenfield: no earlier projects (q-tree-sitter, tree-sitter-q, better-q-graphify, qverify, graphify); no tree-sitter.
+- Fully greenfield: no earlier projects (q-tree-sitter, tree-sitter-q, better-q-graphify, qverify); graphify only as output-format target, no dependency, no code read. No tree-sitter.
 - uv only. No commit trailers. No remote or push until Arvind says so.
-- Third-party q code runs only in the sandbox and only with `--execute`.
-- Quote errors verbatim; never claim unmeasured results. Stop and report after each milestone.
-- Normalize backslash commands to `system "..."` form (`\l f.q` -> `system "l f.q"`, `\w` -> `system "w"`, `\d` likewise). Lone `\` is not a command.
-- MUST work with graphify: add an export adapter (graphify-compatible graph), no dependency on graphify. Confirm schema source with Arvind first.
-- Scratch files go in the session scratchpad, not `/tmp`.
+- Third-party q code runs only in the sandbox and only with `--execute`; static pass is also sandboxed.
+- Quote errors verbatim; never claim unmeasured results; held-out test split used once, never tuned on.
+- Normalize backslash commands to `system "..."` form. Lone `\` is not a command.
+- Must work with graphify (export adapter, graphify id rule `{parent}_{stem}_{entity}`, lowercase).
+- Scratch files go in the session scratchpad, not `/tmp`. Updates to Arvind: plain language, what and why, concise.
 
 ## Gotchas
-- Never run q with interactive stdin (hangs); use `q file.q -q </dev/null`.
-- This q is version 5 (`.z.K=5f`, `.z.k=2026.05.01`), not 4.x. `parse "-x"` raises `'-` here; `neg x` works.
-- `.j.j` is lossy for symbols vs strings and for lambdas; use the tagged tree.
-- Untracked `.serena/` is not ours; leave it.
+- Never run q with interactive stdin (hangs); `q script.q args -q </dev/null`; `-q` goes AFTER the script.
+- q here is version 5 (`.z.K=5f`): `parse "-x"` raises `'-`; assigning to keywords (`cols:`, `use:`, `neg:`) raises `'assign`.
+- Lambda `value` free list: first element is the definition namespace, last is empty; strip both.
+- sandbox-exec: pair `deny file-read-data` with `allow file-read-data file-read-metadata`.
+- Untracked `.serena/` is not ours.
 
 ## Commands
-- run: `~/.kx/bin/q <file.q> -q </dev/null`  test: none yet
+- test: `uv run pytest -q`   build: `uv run qlens build ROOT --out DIR [--execute]`   export: `uv run qlens export ROOT --out FILE`
