@@ -22,6 +22,7 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
         defs_agree=0, defs_refuted=0, defs_missed=0,
         agree=0, refuted=0, missed=0, indirect=0, indirect_agree=0, indirect_refuted=0, dangling=0, ns_mismatch=0,
     )  # fmt: skip
+    m["examples"] = []
     load_results = []
     out_edges: dict[str, list[tuple]] = {}
     for k, e in g.edges.items():
@@ -90,10 +91,17 @@ def merge(g, files: list[dict], dyn: dict, defs_index: dict) -> dict:
                     _set(e, "D3", "confirmed by value of the loaded function")
                     m["agree"] += 1
                 elif raws:
+                    if len([x for x in m["examples"] if x["kind"] == "refuted"]) < 12:
+                        m["examples"].append(dict(kind="refuted", file=rel, fn=fi["name"], names=sorted(raws), role=e["relation"], line=e["line"],
+                                                  live_free=sorted(dfree)[:20], static_free=sorted(fi["free"])[:20], live_ctx=info.get("ctx"), static_ns=fi["ns"]))  # fmt: skip
                     if e["tier"] == "S-indirect":
                         m["indirect_refuted"] += 1
                     _set(e, "S-refuted", "name absent from the free names of the live function")
                     m["refuted"] += 1
-            m["missed"] += len(dfree - fi["free"])
+            extra = dfree - fi["free"]
+            if extra and len([x for x in m["examples"] if x["kind"] == "missed"]) < 12:
+                m["examples"].append(dict(kind="missed", file=rel, fn=fi["name"], names=sorted(extra)[:10], live_free=sorted(dfree)[:20],
+                                          static_free=sorted(fi["free"])[:20], live_ctx=info.get("ctx"), static_ns=fi["ns"]))  # fmt: skip
+            m["missed"] += len(extra)
     m["load_results"] = load_results
     return m

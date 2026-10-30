@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from .evaluate import evaluate
 from .graph import analyse, write_outputs
@@ -30,6 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     ms.add_argument("root")
     ms.add_argument("--backend", choices=["docker", "sandbox-exec"])
     ms.add_argument("--timeout", type=float, default=30)
+    ms.add_argument("--examples", help="write concrete refuted/missed examples (function, names, both free lists) to this JSON file")
     c = sub.add_parser("corpus", help="resumable corpus run, one subprocess per repo")
     c.add_argument("corpora")
     c.add_argument("--split", choices=["dev", "test", "all"], default="dev")
@@ -92,6 +94,10 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "measure":
         res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout, log=_log)
         dyn = {k: v for k, v in res["meta"]["dynamic"].items() if k != "load_results"}
+        if a.examples:
+            Path(a.examples).write_text(json.dumps(dyn.get("examples", []), indent=1))
+            print(f"wrote {len(dyn.get('examples', []))} mismatch examples to {a.examples}", file=sys.stderr)
+        dyn["examples"] = len(dyn.get("examples", []))
         print(json.dumps(dict(root=a.root, **dyn)))
         return 0
     if a.cmd == "eval":
