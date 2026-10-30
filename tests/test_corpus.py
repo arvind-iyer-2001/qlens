@@ -63,6 +63,18 @@ def test_measure_examples_cli(tmp_path):
     assert json.loads(ex.read_text()) == []  # nothing disputed in clean code
 
 
+@pytest.mark.skipif(not HAVE_Q, reason="q not installed")
+def test_measure_load_results_cli(tmp_path):
+    from qlens.cli import main
+
+    (tmp_path / "ok.q").write_text("g:{x}\n")
+    (tmp_path / "bad.q").write_text("a:{x}\nb:undefinedname+1\n")
+    out = tmp_path / "lr.json"
+    assert main(["measure", str(tmp_path), "--load-results", str(out)]) == 0
+    rows = {r["file"]: r for r in json.loads(out.read_text())}
+    assert rows["ok.q"]["loaded"] and not rows["bad.q"]["loaded"] and rows["bad.q"]["error"] == "undefinedname"
+
+
 def test_load_causes_group_by_what_went_wrong_not_by_name():
     from qlens.corpus import load_cause, load_causes
 

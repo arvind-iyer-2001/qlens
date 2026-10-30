@@ -32,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     ms.add_argument("--backend", choices=["docker", "sandbox-exec"])
     ms.add_argument("--timeout", type=float, default=30)
     ms.add_argument("--examples", help="write concrete refuted/missed examples (function, names, both free lists) to this JSON file")
+    ms.add_argument("--load-results", help="write per-file load results (file, loaded, error, names defined) to this JSON file")
     c = sub.add_parser("corpus", help="resumable corpus run, one subprocess per repo")
     c.add_argument("corpora")
     c.add_argument("--split", choices=["dev", "test", "all"], default="dev")
@@ -89,6 +90,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if a.cmd == "measure":
         res = analyse(a.root, execute=True, backend=a.backend, timeout=a.timeout, log=_log)
+        if a.load_results:
+            rows = res["meta"]["dynamic"].get("load_results", [])
+            Path(a.load_results).write_text(json.dumps(rows, indent=1))
+            print(f"wrote {len(rows)} per-file load results to {a.load_results}", file=sys.stderr)
         dyn = {k: v for k, v in res["meta"]["dynamic"].items() if k != "load_results"}
         from .corpus import load_causes
 

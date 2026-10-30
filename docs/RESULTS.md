@@ -144,4 +144,12 @@ qlens's own harness, so files locating their folder from it looked inside qlens 
 `.../qlens/src/qlens/q/dynamic.q/analytics.q: Not a directory`). Fixed by launching the target as the main script.
 Other causes are environment limits, not bugs: puzzle input files absent from the repo (Advent-of-Code repos: 4 repos, ~364 files),
 downloads and network (`.ut.download`, `hop`), framework bootstrap (`.proc.getconfigfile`), embedPy (`.p.import`).
-The effect of the fix on the loaded rate is not measured yet (dev run 7 pending).
+
+Dev run 7 (after the fix; dev split only):
+- Files loaded 947 -> 988 of 2069 (45.8% -> 47.1%), almost all in kdbx-modules (70 -> 111). Process failures 49 -> 19.
+- Reference edges judged 9765 -> 9838; refuted 2 -> 2; missed 0 -> 0; precision 0.99980, recall 1.0 (unchanged).
+- Definitions: refuted 88 -> 90 (+2, kdbx-modules), missed 79 -> 270. More code now runs, so more runtime-created names show up:
+  `k)` definitions and state created inside functions (quantQ's test files create framework state; kdb-taq defines `o,F,S,dst,D` on a `k)` line).
+  These are gaps in the static pass's view of definitions, not wrong edges. Files that call `exit` before finishing (43 in amber's bench)
+  are reported as "exited before the file finished loading": names defined before the exit are confirmed, nothing after it is judged.
+- One file in q-evm stopped loading (3 -> 2 loaded files); cause not yet identified (use `qlens measure --load-results`).
