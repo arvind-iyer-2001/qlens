@@ -51,3 +51,13 @@ def test_run_corpus_is_resumable(tmp_path):
     assert {r["repo"] for r in rows} == {"o__one", "o__two"} and all(r["status"] == "ok" for r in rows)
     assert all(r["agree"] >= 1 and r["refuted"] == 0 for r in rows)
     assert run_corpus(corp, "all", jobs=2, timeout=120, out=out) == 0  # nothing left to do
+
+
+@pytest.mark.skipif(not HAVE_Q, reason="q not installed")
+def test_measure_examples_cli(tmp_path):
+    from qlens.cli import main
+
+    (tmp_path / "a.q").write_text("g:{x}\nf:{g x}\n")
+    ex = tmp_path / "ex.json"
+    assert main(["measure", str(tmp_path), "--examples", str(ex)]) == 0
+    assert json.loads(ex.read_text()) == []  # nothing disputed in clean code

@@ -57,7 +57,6 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(res['nodes'])} nodes, {len(res['edges'])} edges, {len(res['enrichment_queue'])} queued, {d} diagnostics -> {a.out}")
         return 0
     if a.cmd == "corpus":
-        from pathlib import Path
 
         from .corpus import run_corpus
 
@@ -65,14 +64,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ran {n} repos -> {a.out}")
         return 0
     if a.cmd == "calibrate":
-        from pathlib import Path
 
         from .corpus import calibrate
 
         print(json.dumps(calibrate(Path(a.results), Path(a.out)), indent=2))
         return 0
     if a.cmd == "summary":
-        from pathlib import Path
 
         from .corpus import summarise
 
@@ -80,7 +77,6 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(summarise(Path(a.results), sp), indent=2))
         return 0
     if a.cmd == "export":
-        from pathlib import Path
 
         from .export import to_graphify
 
