@@ -24,6 +24,7 @@ qlens: greenfield q/kdb+ knowledge-graph tool; q itself is the parser (SPEC.md i
 - uv only. No commit trailers. No remote or push until Arvind says so.
 - Third-party q code runs only in the sandbox and only with `--execute`.
 - Quote errors verbatim; never claim unmeasured results. Stop and report after each milestone.
+- Normalize backslash commands to `system "..."` form (`\l f.q` -> `system "l f.q"`, `\w` -> `system "w"`, `\d` likewise). Lone `\` is not a command.
 - Scratch files go in the session scratchpad, not `/tmp`.
 
 ## Gotchas
