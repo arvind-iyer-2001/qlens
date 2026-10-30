@@ -30,7 +30,7 @@ qlens extracts a q/kdb+ knowledge graph deterministically (no LLM, no tree-sitte
 
 ## Constraints & assumptions
 - Fully greenfield: no earlier projects (q-tree-sitter, tree-sitter-q, better-q-graphify, qverify); graphify only as output-format target, no dependency, no code read. No tree-sitter.
-- uv only. No commit trailers. No remote or push until Arvind says so.
+- uv only. No commit trailers. Remote: `origin` = github.com/arvind-iyer-2001/qlens (PRIVATE, published 2026-10-30 on Arvind's request); push only when asked.
 - Third-party q code runs only in the sandbox and only with `--execute`; static pass is also sandboxed.
 - Quote errors verbatim; never claim unmeasured results; held-out test split used once, never tuned on.
 - Normalize backslash commands to `system "..."` form. Lone `\` is not a command.
